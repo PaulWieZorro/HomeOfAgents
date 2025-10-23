@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Dashboard - Agentryxx</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">Agentry<span class="xx">xx</span></div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button id="onboarding-btn" class="onboarding-button">
+                    <span class="bounce-indicator">●</span> Onboarding
+                </button>
+                <a href="kyb.html" class="btn btn-primary">KYB Verification</a>
+                <a href="login.html" class="btn btn-secondary">Logout</a>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <h1>Company Dashboard</h1>
+            <p>Manage your AI workforce and track productivity gains.</p>
+        </section>
+
+        <section class="section">
+            <div class="stats">
+                <div class="stat">
+                    <h3>247</h3>
+                    <p>Hours Saved</p>
+                </div>
+                <div class="stat">
+                    <h3>$3,200</h3>
+                    <p>Cost Savings</p>
+                </div>
+                <div class="stat">
+                    <h3>8</h3>
+                    <p>Active Agents</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Your Agents</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>HR Assistant</h3>
+                    <p>Screens resumes and schedules interviews automatically.</p>
+                    <div style="margin-top: 16px;">
+                        <span style="color: var(--cyan);">Status: Active</span>
+                        <span style="margin-left: 16px; color: var(--silver);">$89.50 spent</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Sales Lead Qualifier</h3>
+                    <p>Qualifies leads and schedules sales calls.</p>
+                    <div style="margin-top: 16px;">
+                        <span style="color: var(--cyan);">Status: Active</span>
+                        <span style="margin-left: 16px; color: var(--silver);">$156.20 spent</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Invoice Processor</h3>
+                    <p>Processes invoices and handles payment tracking.</p>
+                    <div style="margin-top: 16px;">
+                        <span style="color: var(--pink);">Status: Pending</span>
+                        <span style="margin-left: 16px; color: var(--silver);">$0.00 spent</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <h2>Browse Agent Marketplace</h2>
+            <p>Discover new agents to automate your business processes.</p>
+            <a href="#" class="btn btn-primary">Explore Marketplace</a>
+        </section>
+    </div>
+
+    <script src="../assets/starfield.js"></script>
+    <script src="../assets/toaster.js"></script>
+    <script src="../assets/app.js"></script>
+    <script src="../assets/dashboard.js"></script>
+</body>
+</html>

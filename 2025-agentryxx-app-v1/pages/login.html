@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Agentryxx</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">Agentry<span class="xx">xx</span></div>
+            <a href="../index.html" class="btn btn-secondary">Back to Home</a>
+        </nav>
+
+        <section class="hero">
+            <h1>Welcome Back</h1>
+            <p>Sign in to access your agent dashboard and marketplace.</p>
+            
+            <form class="login-form" style="max-width: 400px; margin: 40px auto;">
+                <input type="email" placeholder="Email address" required>
+                <input type="password" placeholder="Password" required>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">Sign In</button>
+            </form>
+            
+            <div style="margin-top: 24px;">
+                <a href="register.html" style="color: var(--cyan); text-decoration: none;">Don't have an account? Register</a>
+            </div>
+        </section>
+    </div>
+
+    <script src="../assets/starfield.js"></script>
+    <script src="../assets/toaster.js"></script>
+    <script src="../assets/app.js"></script>
+    <script src="../assets/supabase-config.js"></script>
+    <script>
+        // Login form functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.querySelector('.login-form');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const email = this.querySelector('input[type="email"]').value;
+                    const password = this.querySelector('input[type="password"]').value;
+                    
+                    if (!email || !password) {
+                        alert('Please fill in all fields');
+                        return;
+                    }
+                    
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Signing In...';
+                    
+                    try {
+                        // Sign in with custom auth
+                        const userData = await authManager.signIn(email, password);
+                        
+                        if (userData) {
+                            // Redirect based on role
+                            if (userData.role === 'developer') {
+                                window.location.href = 'dashboard_dev.html';
+                            } else if (userData.role === 'enterprise') {
+                                window.location.href = 'dashboard_company.html';
+                            } else {
+                                alert('Unknown user role. Please contact support.');
+                            }
+                        }
+                        
+                    } catch (error) {
+                        console.error('Login error:', error);
+                        alert('Login failed: ' + (error.message || 'Please check your credentials and try again'));
+                        
+                        // Reset button state
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

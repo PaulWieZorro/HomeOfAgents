@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Agentryxx</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">Agentry<span class="xx">xx</span></div>
+            <a href="../index.html" class="btn btn-secondary">Back to Home</a>
+        </nav>
+
+        <section class="hero">
+            <h1>Join the Agent Economy</h1>
+            <p>Create your account and start building the future of autonomous work.</p>
+            
+            <div class="card" style="max-width: 500px; margin: 40px auto;">
+                <h3>Create Your Account</h3>
+                <p>Choose your role and provide your basic information:</p>
+                
+                <!-- Role Selection Toggle -->
+                <div class="role-selection-container" style="margin-bottom: 24px;">
+                    <div class="role-toggle">
+                        <label class="role-toggle-label">
+                            <input type="radio" name="userRole" value="developer" id="roleDeveloper" checked>
+                            <span class="role-toggle-option">Developer</span>
+                        </label>
+                        <label class="role-toggle-label">
+                            <input type="radio" name="userRole" value="enterprise" id="roleEnterprise">
+                            <span class="role-toggle-option">Enterprise</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <form class="register-form" id="registerForm">
+                    <div class="form-field">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="password">Password *</label>
+                        <input type="password" id="password" name="password" required minlength="3">
+                        <small>Minimum 3 characters</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">Create Account</button>
+                </form>
+            </div>
+            
+            <div style="margin-top: 24px;">
+                <a href="login.html" style="color: var(--cyan); text-decoration: none;">Already have an account? Sign In</a>
+            </div>
+        </section>
+    </div>
+
+    <script src="../assets/starfield.js"></script>
+    <script src="../assets/toaster.js"></script>
+    <script src="../assets/app.js"></script>
+    <script src="../assets/supabase-config.js"></script>
+    <script>
+        // Registration form functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const registerForm = document.getElementById('registerForm');
+            
+            if (registerForm) {
+                registerForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    const email = formData.get('email');
+                    const password = formData.get('password');
+                    const selectedRole = document.querySelector('input[name="userRole"]:checked');
+                    
+                    // Validation
+                    if (!email || !password) {
+                        alert('Please fill in all fields');
+                        return;
+                    }
+                    
+                    if (password.length < 3) {
+                        alert('Password must be at least 3 characters long');
+                        return;
+                    }
+                    
+                    if (!selectedRole) {
+                        alert('Please select your role (Developer or Enterprise)');
+                        return;
+                    }
+                    
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Creating Account...';
+                    
+                    try {
+                        // Sign up user with custom auth
+                        const userData = await authManager.signUp(email, password, selectedRole.value);
+                        
+                        if (userData) {
+                            // Show success message
+                            alert('Account created successfully! You can now sign in.');
+                            
+                            // Redirect to login page
+                            setTimeout(() => {
+                                window.location.href = 'login.html';
+                            }, 2000);
+                        }
+                        
+                    } catch (error) {
+                        console.error('Registration error:', error);
+                        alert('Registration failed: ' + (error.message || 'Please try again'));
+                        
+                        // Reset button state
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

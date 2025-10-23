@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KYB Verification - Agentryxx</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">Agentry<span class="xx">xx</span></div>
+            <a href="../index.html" class="btn btn-secondary">Back to Home</a>
+        </nav>
+
+        <section class="hero">
+            <h1>Business Verification</h1>
+            <p>Complete your KYB to access full platform features and start earning.</p>
+            
+            <div class="card" style="max-width: 600px; margin: 40px auto;">
+                <h3>Business Verification Form</h3>
+                <p>Please provide the following information for enterprise verification:</p>
+                
+                <form class="kyb-form" id="kybForm">
+                    <!-- Company Information -->
+                    <div class="form-field">
+                        <label for="legalCompanyName">Legal Company Name</label>
+                        <input type="text" id="legalCompanyName" name="legalCompanyName" required>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="streetNumber">Street & No</label>
+                        <input type="text" id="streetNumber" name="streetNumber" required>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="postcode">Postcode</label>
+                        <input type="text" id="postcode" name="postcode" required>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="city">City</label>
+                        <input type="text" id="city" name="city" required>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="countryOfRegistration">Country of Registration</label>
+                        <select id="countryOfRegistration" name="countryOfRegistration" required>
+                            <option value="">Select Country</option>
+                            <option value="US">United States</option>
+                            <option value="UK">United Kingdom</option>
+                            <option value="DE">Germany</option>
+                            <option value="FR">France</option>
+                            <option value="CA">Canada</option>
+                            <option value="AU">Australia</option>
+                            <option value="SG">Singapore</option>
+                            <option value="CH">Switzerland</option>
+                            <option value="NL">Netherlands</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="registrationNumber">Registration Number</label>
+                            <input type="text" id="registrationNumber" name="registrationNumber" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="directorName">Director Name</label>
+                            <input type="text" id="directorName" name="directorName" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Email Field -->
+                    <div class="form-field">
+                        <label for="userEmail">Email Address</label>
+                        <input type="email" id="userEmail" name="userEmail" required>
+                        <small>Enter your email address for verification</small>
+                    </div>
+                    
+                    <!-- Compliance Checkboxes -->
+                    <div class="form-field checkbox-field">
+                        <input type="checkbox" id="amlCtfVerified" name="amlCtfVerified" required>
+                        <label for="amlCtfVerified">I verify AML and CTF Certificate compliance</label>
+                    </div>
+                    
+                    <div class="form-field checkbox-field">
+                        <input type="checkbox" id="gdprConsent" name="gdprConsent" required>
+                        <label for="gdprConsent">I agree to GDPR terms and consent to receive emails</label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary form-submit" id="submitBtn" disabled>Submit for Verification</button>
+                </form>
+            </div>
+            
+            <div style="margin-top: 24px;">
+                <a href="dashboard_company.html" style="color: var(--cyan); text-decoration: none;">Skip for now</a>
+            </div>
+        </section>
+    </div>
+
+    <script src="../assets/starfield.js"></script>
+    <script src="../assets/toaster.js"></script>
+    <script src="../assets/app.js"></script>
+    <script src="../assets/supabase-config.js"></script>
+    <script src="../assets/otp-verification.js"></script>
+    <script src="../assets/form-validation.js"></script>
+    
+    <script>
+        // KYB Form Validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('kybForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const requiredFields = form.querySelectorAll('input[required], textarea[required], select[required]');
+            const checkboxes = form.querySelectorAll('input[type="checkbox"][required]');
+            
+            function validateForm() {
+                let allFieldsFilled = true;
+                let allCheckboxesChecked = true;
+                
+                // Check all required fields
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        allFieldsFilled = false;
+                    }
+                });
+                
+                // Check all required checkboxes
+                checkboxes.forEach(checkbox => {
+                    if (!checkbox.checked) {
+                        allCheckboxesChecked = false;
+                    }
+                });
+                
+                // Enable/disable submit button
+                if (allFieldsFilled && allCheckboxesChecked) {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('btn-secondary');
+                    submitBtn.classList.add('btn-primary');
+                } else {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.remove('btn-primary');
+                    submitBtn.classList.add('btn-secondary');
+                }
+            }
+            
+            // Add event listeners to all form elements
+            [...requiredFields, ...checkboxes].forEach(element => {
+                element.addEventListener('input', validateForm);
+                element.addEventListener('change', validateForm);
+            });
+            
+            // Initial validation
+            validateForm();
+            
+            // Form submission
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (!submitBtn.disabled) {
+                    try {
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Submitting...';
+                        
+                        // Get form data
+                        const formData = new FormData(form);
+                        
+                        // Get user email from form input
+                        const userEmail = formData.get('userEmail');
+                        
+                        if (!userEmail || userEmail.trim() === '') {
+                            throw new Error('Email address is required');
+                        }
+                        
+                        console.log('User email from form:', userEmail);
+                        
+                        // Additional validation to prevent null pointer errors
+                        if (typeof userEmail !== 'string') {
+                            throw new Error('Invalid user email format');
+                        }
+                        
+                        // Prepare KYB data with null protection
+                        const kybData = {
+                            user_email: userEmail.trim(), // Ensure no whitespace
+                            legal_company_name: formData.get('legalCompanyName') || '',
+                            street_number: formData.get('streetNumber') || '',
+                            postcode: formData.get('postcode') || '',
+                            city: formData.get('city') || '',
+                            country_of_registration: formData.get('countryOfRegistration') || '',
+                            registration_number: formData.get('registrationNumber') || '',
+                            director_name: formData.get('directorName') || '',
+                            registration_document_url: '', // No document upload anymore
+                            aml_ctf_verified: formData.get('amlCtfVerified') === 'on',
+                            gdpr_consent: formData.get('gdprConsent') === 'on'
+                        };
+                        
+                        // Validate all required fields are not empty
+                        const requiredFields = ['legal_company_name', 'street_number', 'postcode', 'city', 'country_of_registration', 'registration_number', 'director_name', 'user_email'];
+                        for (const field of requiredFields) {
+                            if (!kybData[field] || kybData[field].trim() === '') {
+                                throw new Error(`Required field ${field} is empty`);
+                            }
+                        }
+                        
+                        console.log('KYB data to be inserted:', kybData);
+                        
+                        // Insert KYB data directly using supabase client
+                        const { data: result, error: insertError } = await supabase
+                            .from('kyb_data')
+                            .insert([kybData]);
+                            
+                        if (insertError) {
+                            console.error('Direct insertion error:', insertError);
+                            throw insertError;
+                        }
+                        
+                        console.log('KYB data insertion result:', result);
+                        console.log('KYB form submitted successfully');
+                        alert('KYB verification submitted successfully! You will be contacted once verification is complete.');
+                        
+                        // Redirect to dashboard
+                        window.location.href = 'dashboard_company.html';
+                        
+                    } catch (error) {
+                        console.error('KYB submission error:', error);
+                        alert('Error submitting KYB form: ' + error.message);
+                        
+                        // Re-enable submit button
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Submit for Verification';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
