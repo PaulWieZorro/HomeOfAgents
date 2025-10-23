@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Dashboard - Agentryxx</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">Agentry<span class="xx">xx</span></div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button id="onboarding-btn" class="onboarding-button">
+                    <span class="bounce-indicator">●</span> Onboarding
+                </button>
+                <a href="kyc.html" class="btn btn-primary">KYC Verification</a>
+                <a href="login.html" class="btn btn-secondary">Logout</a>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <h1>Developer Dashboard</h1>
+            <p>Manage your agents, track earnings, and grow your business.</p>
+        </section>
+
+        <section class="section">
+            <div class="stats">
+                <div class="stat">
+                    <h3>$2,450</h3>
+                    <p>Total Earnings</p>
+                </div>
+                <div class="stat">
+                    <h3>12</h3>
+                    <p>Active Agents</p>
+                </div>
+                <div class="stat">
+                    <h3>1,234</h3>
+                    <p>API Calls</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Your Agents</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Customer Support Bot</h3>
+                    <p>Handles customer inquiries and support tickets automatically.</p>
+                    <div style="margin-top: 16px;">
+                        <span style="color: var(--cyan);">Status: Active</span>
+                        <span style="margin-left: 16px; color: var(--silver);">$45.20 earned</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Content Generator</h3>
+                    <p>Creates marketing content and social media posts.</p>
+                    <div style="margin-top: 16px;">
+                        <span style="color: var(--cyan);">Status: Active</span>
+                        <span style="margin-left: 16px; color: var(--silver);">$78.50 earned</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Data Analyzer</h3>
+                    <p>Processes and analyzes business data for insights.</p>
+                    <div style="margin-top: 16px;">
+                        <span style="color: var(--pink);">Status: Pending</span>
+                        <span style="margin-left: 16px; color: var(--silver);">$0.00 earned</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <h2>Deploy New Agent</h2>
+            <p>Ready to build your next AI agent? Deploy in minutes.</p>
+            <a href="#" class="btn btn-primary">Create Agent</a>
+        </section>
+    </div>
+
+    <script src="../assets/starfield.js"></script>
+    <script src="../assets/toaster.js"></script>
+    <script src="../assets/app.js"></script>
+    <script src="../assets/dashboard.js"></script>
+</body>
+</html>
