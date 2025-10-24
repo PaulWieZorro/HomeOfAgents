@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create AI Agent - Agentryxx</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            height: 500px;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(46, 46, 46, 0.2);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        
+        .message.user {
+            background: linear-gradient(90deg, var(--pink), var(--cyan));
+            color: var(--dark);
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        
+        .message.assistant {
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--light);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            align-self: flex-start;
+        }
+        
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid rgba(0, 229, 255, 0.2);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(10, 17, 40, 0.8);
+            color: var(--light);
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--cyan);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+        
+        .voice-button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid var(--cyan);
+            background: transparent;
+            color: var(--cyan);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .voice-button:hover {
+            background: rgba(0, 229, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+        
+        .voice-button.recording {
+            background: var(--pink);
+            border-color: var(--pink);
+            color: var(--dark);
+            animation: pulse-glow 1s ease-in-out infinite;
+        }
+        
+        .requirements-summary {
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(46, 46, 46, 0.2);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .requirements-summary h3 {
+            color: var(--cyan);
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .requirement-section {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(0, 229, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--cyan);
+        }
+        
+        .requirement-section h4 {
+            color: var(--light);
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+        
+        .requirement-section p {
+            color: var(--silver);
+            line-height: 1.6;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .typing-indicator {
+            display: none;
+            color: var(--cyan);
+            font-style: italic;
+        }
+        
+        .typing-indicator.show {
+            display: block;
+        }
+        
+        .typing-dots {
+            display: inline-block;
+            animation: typing 1.5s infinite;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">Agentry<span class="xx">xx</span></div>
+            <a href="dashboard_dev.html" class="btn btn-secondary">Go Back</a>
+        </nav>
+
+        <section class="hero">
+            <h1>Create Your AI Agent</h1>
+            <p>Let's design your perfect AI agent through conversation. Define the problem, solution, and measurable value.</p>
+        </section>
+
+        <section class="section">
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message assistant">
+                        <strong>AI Agent Designer:</strong> Hi! I'm here to help you design your AI agent. Let's start by understanding what problem you want to solve. What specific challenge or task would you like your agent to address?
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Describe the problem you want to solve..." />
+                    <button class="voice-button" id="voiceButton" title="Voice Input">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="btn btn-primary" id="sendButton">Send</button>
+                </div>
+                
+                <div class="typing-indicator" id="typingIndicator">
+                    AI Agent Designer is typing<span class="typing-dots">...</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="requirementsSection" style="display: none;">
+            <div class="requirements-summary">
+                <h3>Agent Requirements Summary</h3>
+                
+                <div class="requirement-section">
+                    <h4>Problem Statement</h4>
+                    <p id="problemStatement">[Problem will be defined through conversation]</p>
+                </div>
+                
+                <div class="requirement-section">
+                    <h4>Proposed Solution</h4>
+                    <p id="proposedSolution">[Solution will be refined through conversation]</p>
+                </div>
+                
+                <div class="requirement-section">
+                    <h4>Measurable Value</h4>
+                    <p id="measurableValue">[Value metrics will be established through conversation]</p>
+                </div>
+                
+                <div class="requirement-section">
+                    <h4>Technical Requirements</h4>
+                    <p id="technicalRequirements">[Technical specifications will be detailed through conversation]</p>
+                </div>
+                
+                <div class="requirement-section">
+                    <h4>Success Metrics</h4>
+                    <p id="successMetrics">[KPIs and success criteria will be defined through conversation]</p>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="editRequirements">Edit Requirements</button>
+                    <button class="btn btn-primary" id="generateAgent">Generate Agent Code</button>
+                    <button class="btn btn-secondary" id="saveDraft">Save as Draft</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="../assets/starfield.js"></script>
+    <script src="../assets/toaster.js"></script>
+    <script src="../assets/app.js"></script>
+    
+    <script>
+        class AgentDesigner {
+            constructor() {
+                this.chatMessages = document.getElementById('chatMessages');
+                this.chatInput = document.getElementById('chatInput');
+                this.sendButton = document.getElementById('sendButton');
+                this.voiceButton = document.getElementById('voiceButton');
+                this.typingIndicator = document.getElementById('typingIndicator');
+                this.requirementsSection = document.getElementById('requirementsSection');
+                
+                this.conversationState = {
+                    step: 'problem',
+                    problem: '',
+                    solution: '',
+                    value: '',
+                    technical: '',
+                    metrics: ''
+                };
+                
+                this.isRecording = false;
+                this.recognition = null;
+                
+                this.init();
+            }
+            
+            init() {
+                this.sendButton.addEventListener('click', () => this.sendMessage());
+                this.chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+                
+                this.voiceButton.addEventListener('click', () => this.toggleVoiceInput());
+                
+                // Initialize voice recognition
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    this.recognition = new SpeechRecognition();
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = false;
+                    this.recognition.lang = 'en-US';
+                    
+                    this.recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        this.chatInput.value = transcript;
+                        this.isRecording = false;
+                        this.voiceButton.classList.remove('recording');
+                        this.voiceButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                    };
+                    
+                    this.recognition.onerror = () => {
+                        this.isRecording = false;
+                        this.voiceButton.classList.remove('recording');
+                        this.voiceButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                    };
+                }
+                
+                document.getElementById('editRequirements').addEventListener('click', () => this.editRequirements());
+                document.getElementById('generateAgent').addEventListener('click', () => this.generateAgent());
+                document.getElementById('saveDraft').addEventListener('click', () => this.saveDraft());
+            }
+            
+            sendMessage() {
+                const message = this.chatInput.value.trim();
+                if (!message) return;
+                
+                this.addMessage(message, 'user');
+                this.chatInput.value = '';
+                
+                this.showTyping();
+                
+                setTimeout(() => {
+                    this.processUserInput(message);
+                }, 1000);
+            }
+            
+            addMessage(text, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+                messageDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'AI Agent Designer'}:</strong> ${text}`;
+                this.chatMessages.appendChild(messageDiv);
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+            
+            showTyping() {
+                this.typingIndicator.classList.add('show');
+                setTimeout(() => {
+                    this.typingIndicator.classList.remove('show');
+                }, 2000);
+            }
+            
+            processUserInput(message) {
+                let response = '';
+                
+                switch (this.conversationState.step) {
+                    case 'problem':
+                        this.conversationState.problem = message;
+                        response = `Great! I understand you want to solve: "${message}". Now let's think about the solution. How would you envision an AI agent solving this problem? What specific capabilities should it have?`;
+                        this.conversationState.step = 'solution';
+                        break;
+                        
+                    case 'solution':
+                        this.conversationState.solution = message;
+                        response = `Excellent solution approach! Now let's define the measurable value. What specific metrics or outcomes would indicate success? For example: time saved, cost reduction, accuracy improvement, etc.`;
+                        this.conversationState.step = 'value';
+                        break;
+                        
+                    case 'value':
+                        this.conversationState.value = message;
+                        response = `Perfect! Now let's discuss technical requirements. What integrations, APIs, or data sources would your agent need? Any specific performance requirements?`;
+                        this.conversationState.step = 'technical';
+                        break;
+                        
+                    case 'technical':
+                        this.conversationState.technical = message;
+                        response = `Great technical details! Finally, let's define success metrics. What KPIs would you track to measure the agent's performance? How would you know it's working effectively?`;
+                        this.conversationState.step = 'metrics';
+                        break;
+                        
+                    case 'metrics':
+                        this.conversationState.metrics = message;
+                        response = `Fantastic! I have all the information needed. Let me generate a comprehensive requirements summary for your AI agent.`;
+                        setTimeout(() => this.generateRequirementsSummary(), 1500);
+                        break;
+                }
+                
+                this.addMessage(response, 'assistant');
+            }
+            
+            generateRequirementsSummary() {
+                document.getElementById('problemStatement').textContent = this.conversationState.problem;
+                document.getElementById('proposedSolution').textContent = this.conversationState.solution;
+                document.getElementById('measurableValue').textContent = this.conversationState.value;
+                document.getElementById('technicalRequirements').textContent = this.conversationState.technical;
+                document.getElementById('successMetrics').textContent = this.conversationState.metrics;
+                
+                this.requirementsSection.style.display = 'block';
+                this.requirementsSection.scrollIntoView({ behavior: 'smooth' });
+                
+                this.addMessage('Requirements summary generated! You can now edit, generate the agent code, or save as a draft.', 'assistant');
+            }
+            
+            toggleVoiceInput() {
+                if (!this.recognition) {
+                    alert('Voice recognition not supported in this browser');
+                    return;
+                }
+                
+                if (this.isRecording) {
+                    this.recognition.stop();
+                    this.isRecording = false;
+                    this.voiceButton.classList.remove('recording');
+                    this.voiceButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                } else {
+                    this.recognition.start();
+                    this.isRecording = true;
+                    this.voiceButton.classList.add('recording');
+                    this.voiceButton.innerHTML = '<i class="fas fa-stop"></i>';
+                }
+            }
+            
+            editRequirements() {
+                this.requirementsSection.style.display = 'none';
+                this.conversationState.step = 'problem';
+                this.addMessage('Let\'s refine your requirements. What would you like to change or add?', 'assistant');
+            }
+            
+            generateAgent() {
+                this.addMessage('Generating agent code based on your requirements...', 'assistant');
+                // Here you would integrate with actual agent generation service
+                setTimeout(() => {
+                    alert('Agent code generated! Redirecting to deployment...');
+                    window.location.href = 'dashboard_dev.html';
+                }, 2000);
+            }
+            
+            saveDraft() {
+                const draft = {
+                    timestamp: new Date().toISOString(),
+                    requirements: this.conversationState
+                };
+                
+                localStorage.setItem('agentDraft', JSON.stringify(draft));
+                alert('Draft saved successfully!');
+            }
+        }
+        
+        // Initialize the agent designer when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            new AgentDesigner();
+        });
+    </script>
+</body>
+</html>
