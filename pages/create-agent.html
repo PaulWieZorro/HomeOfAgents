@@ -56,10 +56,17 @@
             display: flex;
             gap: 12px;
             align-items: center;
+            justify-content: center;
+        }
+        
+        .chat-input-wrapper {
+            width: 70%;
+            max-width: 560px;
+            position: relative;
         }
         
         .chat-input {
-            flex: 1;
+            width: 100%;
             padding: 12px 16px;
             border: 1px solid rgba(0, 229, 255, 0.3);
             border-radius: 8px;
@@ -67,12 +74,72 @@
             color: var(--light);
             font-size: 16px;
             backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
         
         .chat-input:focus {
             outline: none;
             border-color: var(--cyan);
             box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+        
+        .chat-input.recording {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .sound-waves {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 12px 16px;
+        }
+        
+        .sound-waves.active {
+            opacity: 1;
+        }
+        
+        .wave {
+            width: 9px;
+            height: 20px;
+            background: linear-gradient(to top, var(--cyan), var(--pink));
+            border-radius: 4px;
+            animation: wave-animation 0.8s ease-in-out infinite;
+            transform-origin: center;
+        }
+        
+        @keyframes wave-animation {
+            0%, 100% { 
+                transform: scaleY(0.1);
+                opacity: 0.3;
+            }
+            50% { 
+                transform: scaleY(1);
+                opacity: 1;
+            }
+        }
+        
+        .wave.intense {
+            animation-duration: 0.4s;
+            background: linear-gradient(to top, var(--pink), var(--cyan));
+        }
+        
+        .wave.moderate {
+            animation-duration: 0.6s;
+        }
+        
+        .wave.low {
+            animation-duration: 0.8s;
+            opacity: 0.5;
         }
         
         .voice-button {
@@ -190,7 +257,31 @@
                 </div>
                 
                 <div class="chat-input-container">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="Describe the problem you want to solve..." />
+                    <div class="chat-input-wrapper">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Describe the problem you want to solve..." />
+                        <div class="sound-waves" id="soundWaves">
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                        </div>
+                    </div>
                     <button class="voice-button" id="voiceButton" title="Voice Input">
                         <i class="fas fa-microphone"></i>
                     </button>
@@ -254,6 +345,7 @@
                 this.voiceButton = document.getElementById('voiceButton');
                 this.typingIndicator = document.getElementById('typingIndicator');
                 this.requirementsSection = document.getElementById('requirementsSection');
+                this.soundWaves = document.getElementById('soundWaves');
                 
                 this.conversationState = {
                     step: 'problem',
@@ -266,6 +358,11 @@
                 
                 this.isRecording = false;
                 this.recognition = null;
+                this.audioContext = null;
+                this.analyser = null;
+                this.microphone = null;
+                this.dataArray = null;
+                this.animationId = null;
                 
                 this.init();
             }
@@ -289,15 +386,17 @@
                     this.recognition.onresult = (event) => {
                         const transcript = event.results[0][0].transcript;
                         this.chatInput.value = transcript;
-                        this.isRecording = false;
-                        this.voiceButton.classList.remove('recording');
-                        this.voiceButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                        this.stopRecording();
                     };
                     
                     this.recognition.onerror = () => {
-                        this.isRecording = false;
-                        this.voiceButton.classList.remove('recording');
-                        this.voiceButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                        this.stopRecording();
+                    };
+                    
+                    this.recognition.onend = () => {
+                        if (this.isRecording) {
+                            this.stopRecording();
+                        }
                     };
                 }
                 
@@ -386,23 +485,121 @@
                 this.addMessage('Requirements summary generated! You can now edit, generate the agent code, or save as a draft.', 'assistant');
             }
             
-            toggleVoiceInput() {
+            async toggleVoiceInput() {
                 if (!this.recognition) {
                     alert('Voice recognition not supported in this browser');
                     return;
                 }
                 
                 if (this.isRecording) {
-                    this.recognition.stop();
-                    this.isRecording = false;
-                    this.voiceButton.classList.remove('recording');
-                    this.voiceButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                    this.stopRecording();
                 } else {
+                    await this.startRecording();
+                }
+            }
+            
+            async startRecording() {
+                try {
+                    // Start speech recognition
                     this.recognition.start();
                     this.isRecording = true;
                     this.voiceButton.classList.add('recording');
+                    this.chatInput.classList.add('recording');
                     this.voiceButton.innerHTML = '<i class="fas fa-stop"></i>';
+                    
+                    // Start audio analysis for visual feedback
+                    await this.startAudioAnalysis();
+                    this.startWaveAnimation();
+                    
+                } catch (error) {
+                    console.error('Error starting recording:', error);
+                    this.stopRecording();
                 }
+            }
+            
+            stopRecording() {
+                this.recognition.stop();
+                this.isRecording = false;
+                this.voiceButton.classList.remove('recording');
+                this.chatInput.classList.remove('recording');
+                this.voiceButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                
+                this.stopAudioAnalysis();
+                this.stopWaveAnimation();
+            }
+            
+            async startAudioAnalysis() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    this.analyser = this.audioContext.createAnalyser();
+                    this.microphone = this.audioContext.createMediaStreamSource(stream);
+                    
+                    this.analyser.fftSize = 256;
+                    this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+                    this.microphone.connect(this.analyser);
+                    
+                } catch (error) {
+                    console.error('Error accessing microphone:', error);
+                }
+            }
+            
+            stopAudioAnalysis() {
+                if (this.audioContext) {
+                    this.audioContext.close();
+                    this.audioContext = null;
+                }
+                if (this.microphone) {
+                    this.microphone.disconnect();
+                    this.microphone = null;
+                }
+                this.analyser = null;
+                this.dataArray = null;
+            }
+            
+            startWaveAnimation() {
+                this.soundWaves.classList.add('active');
+                this.animateWaves();
+            }
+            
+            stopWaveAnimation() {
+                this.soundWaves.classList.remove('active');
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+            }
+            
+            animateWaves() {
+                if (!this.isRecording || !this.analyser) {
+                    return;
+                }
+                
+                this.analyser.getByteFrequencyData(this.dataArray);
+                
+                // Calculate average volume
+                let sum = 0;
+                for (let i = 0; i < this.dataArray.length; i++) {
+                    sum += this.dataArray[i];
+                }
+                const average = sum / this.dataArray.length;
+                
+                // Determine intensity level
+                let intensity = 'low';
+                if (average > 100) intensity = 'intense';
+                else if (average > 50) intensity = 'moderate';
+                
+                // Update wave animations based on intensity
+                const waves = this.soundWaves.querySelectorAll('.wave');
+                waves.forEach((wave, index) => {
+                    wave.className = `wave ${intensity}`;
+                    
+                    // Staggered animation delays for wave effect
+                    const delay = index * 0.05; // Faster stagger for dense waves
+                    wave.style.animationDelay = `${delay}s`;
+                });
+                
+                this.animationId = requestAnimationFrame(() => this.animateWaves());
             }
             
             editRequirements() {
