@@ -13,7 +13,55 @@ document.addEventListener('DOMContentLoaded', function() {
             showNotification('Onboarding feature coming soon!', 'info');
         });
     }
+
+    // Initialize charts with animations
+    initializeCharts();
 });
+
+// Chart initialization and animations
+function initializeCharts() {
+    const charts = document.querySelectorAll('.chart-bars');
+    
+    charts.forEach((chart, chartIndex) => {
+        const bars = chart.querySelectorAll('.bar');
+        
+        // Animate bars on load
+        bars.forEach((bar, index) => {
+            // Set initial height to 0
+            bar.style.height = '0%';
+            
+            // Animate to target height with delay
+            setTimeout(() => {
+                const targetHeight = bar.getAttribute('style').match(/height:\s*(\d+%)/);
+                if (targetHeight) {
+                    bar.style.transition = 'height 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                    bar.style.height = targetHeight[1];
+                }
+            }, index * 100 + chartIndex * 200);
+        });
+        
+        // Add hover effects for chart sections
+        const chartSection = chart.closest('.chart-section');
+        if (chartSection) {
+            chartSection.addEventListener('mouseenter', function() {
+                bars.forEach(bar => {
+                    bar.style.transition = 'all 0.3s ease';
+                });
+            });
+        }
+    });
+    
+    // Add click interactions for bars
+    const allBars = document.querySelectorAll('.bar');
+    allBars.forEach(bar => {
+        bar.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            const chartTitle = this.closest('.chart-section').querySelector('h3').textContent;
+            
+            showNotification(`${chartTitle}: ${value}`, 'info');
+        });
+    });
+}
 
 // Notification system for dashboard
 function showNotification(message, type = 'info') {
