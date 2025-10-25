@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Dashboard - Agentryxx</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+        
+        .chart-card {
+            background: rgba(46, 46, 46, 0.2);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .chart-card h3 {
+            color: var(--cyan);
+            margin-bottom: 16px;
+            font-size: 18px;
+            text-align: center;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: rgba(46, 46, 46, 0.2);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stat-card h3 {
+            color: var(--cyan);
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card p {
+            color: var(--silver);
+            font-size: 14px;
+        }
+        
+        .inbox-container {
+            background: rgba(46, 46, 46, 0.2);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 40px 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .inbox-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .inbox-title {
+            color: var(--cyan);
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .inbox-count {
+            background: var(--pink);
+            color: var(--dark);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .message {
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .message:hover {
+            background: rgba(0, 229, 255, 0.1);
+            border-color: rgba(0, 229, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        
+        .message-sender {
+            color: var(--cyan);
+            font-weight: 600;
+            font-size: 14px;
+            margin-right: 12px;
+        }
+        
+        .message-subject {
+            color: var(--light);
+            font-weight: 500;
+            font-size: 14px;
+            flex: 1;
+        }
+        
+        .message-time {
+            color: var(--silver);
+            font-size: 12px;
+        }
+        
+        .message-preview {
+            color: var(--silver);
+            font-size: 13px;
+            line-height: 1.3;
+        }
+        
+        .message-content-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .message.unread {
+            border-left: 4px solid var(--cyan);
+        }
+        
+        .message.system {
+            border-left: 4px solid var(--cyan);
+        }
+        
+        .message.opportunity {
+            border-left: 4px solid var(--pink);
+        }
+        
+        .message.client {
+            border-left: 4px solid #FFD700;
+        }
+        
+        .message.success {
+            border-left: 4px solid #00FF88;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: rgba(10, 17, 40, 0.95);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            margin: 5% auto;
+            padding: 24px;
+            width: 80%;
+            max-width: 600px;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        
+        .modal-title {
+            color: var(--cyan);
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .close {
+            color: var(--silver);
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .close:hover {
+            color: var(--cyan);
+        }
+        
+        .modal-body {
+            color: var(--light);
+            line-height: 1.6;
+        }
+        
+        .modal-sender {
+            color: var(--cyan);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .modal-time {
+            color: var(--silver);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">Agentry<span class="xx">xx</span></div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button id="onboarding-btn" class="onboarding-button">
+                    <span class="bounce-indicator">●</span> Onboarding
+                </button>
+                <a href="kyc.html" class="btn btn-primary">KYC Verification</a>
+                <a href="login.html" class="btn btn-secondary">Logout</a>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <h1>Developer Dashboard</h1>
+            <p>Manage your agents, track earnings, and grow your business.</p>
+        </section>
+
+        <div class="inbox-container">
+            <div class="inbox-header">
+                <div class="inbox-title">
+                    📬 Inbox
+                </div>
+                <div class="inbox-count">5</div>
+            </div>
+            
+            <div class="message system unread" onclick="openMessage(1)">
+                <div class="message-header">
+                    <div class="message-content-row">
+                        <div class="message-sender">System</div>
+                        <div class="message-subject">Monthly Performance Report - December 2024</div>
+                    </div>
+                    <div class="message-time">2 hours ago</div>
+                </div>
+                <div class="message-preview">Your December earnings increased by 36% compared to November...</div>
+            </div>
+            
+            <div class="message opportunity unread" onclick="openMessage(2)">
+                <div class="message-header">
+                    <div class="message-content-row">
+                        <div class="message-sender">Opportunity Bot</div>
+                        <div class="message-subject">New Project Match: Banking Fraud Detection Agent</div>
+                    </div>
+                    <div class="message-time">4 hours ago</div>
+                </div>
+                <div class="message-preview">Based on your risk analysis skills, we found a perfect match...</div>
+            </div>
+            
+            <div class="message opportunity unread" onclick="openMessage(3)">
+                <div class="message-header">
+                    <div class="message-content-row">
+                        <div class="message-sender">Opportunity Bot</div>
+                        <div class="message-subject">Project Opportunity: Insurance Claims Processing Agent</div>
+                    </div>
+                    <div class="message-time">1 day ago</div>
+                </div>
+                <div class="message-preview">A major insurance company is looking for an AI agent...</div>
+            </div>
+            
+            <div class="message client" onclick="openMessage(4)">
+                <div class="message-header">
+                    <div class="message-content-row">
+                        <div class="message-sender">Michael Rodriguez - First National Bank</div>
+                        <div class="message-subject">Loan Processing Bot Enhancement Request</div>
+                    </div>
+                    <div class="message-time">2 days ago</div>
+                </div>
+                <div class="message-preview">Hi! The loan processing bot is working great...</div>
+            </div>
+            
+            <div class="message success" onclick="openMessage(5)">
+                <div class="message-header">
+                    <div class="message-content-row">
+                        <div class="message-sender">Success Manager AI</div>
+                        <div class="message-subject">🎉 Agent Certification Complete!</div>
+                    </div>
+                    <div class="message-time">3 days ago</div>
+                </div>
+                <div class="message-preview">Congratulations! Your "Risk Assessment" agent has successfully passed...</div>
+            </div>
+        </div>
+
+        <section class="section">
+            <h2>Performance Overview</h2>
+            <div class="stats-summary">
+                <div class="stat-card">
+                    <h3>$2,450</h3>
+                    <p>Total Earnings</p>
+                </div>
+                <div class="stat-card">
+                    <h3>12</h3>
+                    <p>Active Agents</p>
+                </div>
+                <div class="stat-card">
+                    <h3>1,234</h3>
+                    <p>API Calls</p>
+                </div>
+            </div>
+            
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3>Total Earnings - Monthly Progression</h3>
+                    <div class="chart-container">
+                        <canvas id="earningsChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <h3>Active Agents - Monthly Progression</h3>
+                    <div class="chart-container">
+                        <canvas id="agentsChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <h3>API Calls - Monthly Progression</h3>
+                    <div class="chart-container">
+                        <canvas id="apiCallsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Your Agents</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Wealth Management Support Agent</h3>
+                    <p>Guarantees 24/7 avalability to wealthy customers, answers every question that has ever been anwered to a client, learns from internal documents.</p>
+                    <div style="margin-top: 16px;">
+                        <span style="color: var(--cyan);">Status: Active</span>
+                        <span style="margin-left: 16px; color: var(--silver);">$2500.20 earned</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Internal Strategy & Planning Support Agent</h3>
+                    <p>Helps Staff with every decision and project proposal to fit into the company's strategy.</p>
+                    <div style="margin-top: 16px;">
+                        <span style="color: var(--cyan);">Status: Active</span>
+                        <span style="margin-left: 16px; color: var(--silver);">$1180.50 earned</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Risk Assessment Agent</h3>
+                    <p>Analyzes credit risk, market volatility, and compliance requirements for financial institutions.</p>
+                    <div style="margin-top: 16px;">
+                        <span style="color: var(--pink);">Status: Certification</span>
+                        <span style="margin-left: 16px; color: var(--silver);">$0.00 earned</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <h2>Deploy New Agent</h2>
+            <p>Ready to build your next AI agent? Deploy in minutes.</p>
+            <a href="create-agent.html" class="btn btn-primary">Create Agent</a>
+        </section>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Message</div>
+                <span class="close" onclick="closeMessage()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="modal-sender" id="modalSender"></div>
+                <div class="modal-time" id="modalTime"></div>
+                <div id="modalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/starfield.js"></script>
+    <script src="../assets/toaster.js"></script>
+    <script src="../assets/app.js"></script>
+    <script src="../assets/dashboard.js"></script>
+    
+    <script>
+        // Message data for modal popups
+        const messages = {
+            1: {
+                sender: "System",
+                time: "2 hours ago",
+                subject: "Monthly Performance Report - December 2024",
+                content: `
+                    <h3>December 2024 Performance Summary</h3>
+                    <p><strong>Earnings Growth:</strong> Your December earnings increased by 36% compared to November, reaching $19,050. This represents your best month yet!</p>
+                    
+                    <p><strong>API Usage:</strong> API calls reached a new record of 1,234 calls, showing strong adoption of your financial services agents.</p>
+                    
+                    <p><strong>Agent Performance:</strong></p>
+                    <ul>
+                        <li>Banking Fraud Detection Agent: $2,500.20 earned (Active)</li>
+                        <li>Insurance Claims Processor: $1,180.50 earned (Active)</li>
+                        <li>Risk Assessment Agent: $0.00 earned (Certification)</li>
+                    </ul>
+                    
+                    <p><strong>Key Metrics:</strong></p>
+                    <ul>
+                        <li>Total Active Agents: 12</li>
+                        <li>Average Response Time: 0.8 seconds</li>
+                        <li>Fraud Detection Accuracy: 99.2%</li>
+                        <li>Claims Processing Speed: 3.2x faster</li>
+                        <li>Compliance Rate: 100%</li>
+                    </ul>
+                    
+                    <p>View detailed analytics and export reports in your dashboard. Keep up the excellent work!</p>
+                `
+            },
+            2: {
+                sender: "Opportunity Bot",
+                time: "4 hours ago",
+                subject: "New Project Match: Banking Fraud Detection Agent",
+                content: `
+                    <h3>Banking Fraud Detection Agent Project</h3>
+                    <p><strong>Client:</strong> MetroBank Financial Services</p>
+                    <p><strong>Project Type:</strong> Real-time Fraud Detection & Risk Management</p>
+                    <p><strong>Estimated Duration:</strong> 4-6 months</p>
+                    <p><strong>Budget Range:</strong> $15,000 - $22,000</p>
+                    
+                    <p><strong>Project Description:</strong></p>
+                    <p>MetroBank is seeking an AI agent to enhance their existing fraud detection system with real-time transaction monitoring, pattern recognition, and automated risk scoring. Based on your proven risk analysis skills and successful Banking Fraud Detection agent, this project is a perfect match.</p>
+                    
+                    <p><strong>Required Skills:</strong></p>
+                    <ul>
+                        <li>Real-time transaction monitoring</li>
+                        <li>Machine learning for fraud detection</li>
+                        <li>Banking API integration</li>
+                        <li>Regulatory compliance (PCI DSS, SOX)</li>
+                        <li>Risk scoring algorithms</li>
+                    </ul>
+                    
+                    <p><strong>Compliance Requirements:</strong></p>
+                    <ul>
+                        <li>PCI DSS Level 1 compliance</li>
+                        <li>Sarbanes-Oxley (SOX) compliance</li>
+                        <li>Bank Secrecy Act (BSA) adherence</li>
+                        <li>Anti-Money Laundering (AML) protocols</li>
+                    </ul>
+                    
+                    <p><strong>Next Steps:</strong></p>
+                    <p>If interested, reply to this message and we'll schedule an introductory call with MetroBank's CTO. The project timeline is flexible and can accommodate your current workload.</p>
+                    
+                    <p><em>This opportunity was matched based on your financial services agent portfolio and compliance expertise.</em></p>
+                `
+            },
+            3: {
+                sender: "Opportunity Bot",
+                time: "1 day ago",
+                subject: "Project Opportunity: Insurance Claims Processing Agent",
+                content: `
+                    <h3>Insurance Claims Processing Agent</h3>
+                    <p><strong>Client:</strong> Global Insurance Group</p>
+                    <p><strong>Project Type:</strong> Automated Claims Processing & Settlement</p>
+                    <p><strong>Estimated Duration:</strong> 6-8 months</p>
+                    <p><strong>Budget Range:</strong> $18,000 - $25,000</p>
+                    
+                    <p><strong>Project Description:</strong></p>
+                    <p>Global Insurance Group is seeking an AI agent to automate their claims processing workflow, including document verification, damage assessment, policy validation, and settlement calculations. This is a high-value, long-term project that could establish you in the insurance AI sector.</p>
+                    
+                    <p><strong>Key Requirements:</strong></p>
+                    <ul>
+                        <li>Document processing and OCR integration</li>
+                        <li>Policy validation and coverage analysis</li>
+                        <li>Damage assessment algorithms</li>
+                        <li>Settlement calculation engines</li>
+                        <li>Regulatory compliance (NAIC standards)</li>
+                    </ul>
+                    
+                    <p><strong>Compliance Notes:</strong></p>
+                    <p>This project requires adherence to National Association of Insurance Commissioners (NAIC) standards and state-specific insurance regulations. We can provide compliance training and certification support if needed.</p>
+                    
+                    <p><strong>Technical Requirements:</strong></p>
+                    <ul>
+                        <li>Integration with existing policy management systems</li>
+                        <li>Real-time processing capabilities</li>
+                        <li>Audit trail and reporting features</li>
+                        <li>Multi-line insurance support (auto, home, commercial)</li>
+                    </ul>
+                    
+                    <p><strong>Timeline:</strong></p>
+                    <p>Project starts in 3 weeks. Initial consultation is scheduled for next Friday at 10 AM.</p>
+                    
+                    <p><em>This is a premium opportunity with excellent growth potential in the insurance technology sector.</em></p>
+                `
+            },
+            4: {
+                sender: "Michael Rodriguez - First National Bank",
+                time: "2 days ago",
+                subject: "Loan Processing Bot Enhancement Request",
+                content: `
+                    <h3>Loan Processing Bot Enhancement</h3>
+                    <p>Hi there!</p>
+                    
+                    <p>I hope this message finds you well. The loan processing bot you developed for us has been working fantastically! Our loan approval times have improved by 65% since implementation, and customer satisfaction scores are at an all-time high.</p>
+                    
+                    <p><strong>Current Performance:</strong></p>
+                    <ul>
+                        <li>Average processing time: 2.3 minutes (down from 6.5 minutes)</li>
+                        <li>Approval accuracy: 94.2%</li>
+                        <li>Customer satisfaction: 98%</li>
+                        <li>System uptime: 99.8%</li>
+                        <li>Compliance rate: 100%</li>
+                    </ul>
+                    
+                    <p><strong>Enhancement Request:</strong></p>
+                    <p>We'd like to add advanced credit risk assessment capabilities to handle our commercial lending portfolio. Specifically, we need support for:</p>
+                    <ul>
+                        <li>Commercial real estate loan analysis</li>
+                        <li>Small business credit scoring</li>
+                        <li>Industry-specific risk models</li>
+                        <li>Regulatory compliance checks (CRA, Fair Lending)</li>
+                    </ul>
+                    
+                    <p><strong>Timeline:</strong></p>
+                    <p>We're hoping to have this implemented within the next 6-8 weeks to coincide with our Q1 commercial lending expansion.</p>
+                    
+                    <p><strong>Budget:</strong></p>
+                    <p>We have allocated $12,000 for this enhancement project, plus ongoing maintenance fees.</p>
+                    
+                    <p><strong>Compliance Requirements:</strong></p>
+                    <ul>
+                        <li>Community Reinvestment Act (CRA) compliance</li>
+                        <li>Fair Lending Act adherence</li>
+                        <li>FDIC examination standards</li>
+                        <li>State banking regulations</li>
+                    </ul>
+                    
+                    <p>Could we schedule a call this week to discuss the technical requirements and timeline? I'm available Tuesday through Thursday after 1 PM.</p>
+                    
+                    <p>Looking forward to continuing our partnership!</p>
+                    
+                    <p>Best regards,<br>
+                    Michael Rodriguez<br>
+                    VP of Digital Banking<br>
+                    First National Bank</p>
+                `
+            },
+            5: {
+                sender: "Success Manager AI",
+                time: "3 days ago",
+                subject: "🎉 Agent Certification Complete!",
+                content: `
+                    <h3>🎉 Congratulations! Agent Certification Successful</h3>
+                    
+                    <p><strong>Agent Name:</strong> Risk Assessment Agent</p>
+                    <p><strong>Certification Date:</strong> December 28, 2024</p>
+                    <p><strong>Certification ID:</strong> RA-2024-003891</p>
+                    
+                    <p><strong>Certification Results:</strong></p>
+                    <ul>
+                        <li>✅ Performance Testing: PASSED</li>
+                        <li>✅ Security Audit: PASSED</li>
+                        <li>✅ Regulatory Compliance: PASSED</li>
+                        <li>✅ API Integration: PASSED</li>
+                        <li>✅ Risk Model Validation: PASSED</li>
+                        <li>✅ Load Testing: PASSED</li>
+                    </ul>
+                    
+                    <p><strong>Performance Metrics:</strong></p>
+                    <ul>
+                        <li>Risk Assessment Accuracy: 97.3% (Outstanding)</li>
+                        <li>Response Time: 0.2 seconds (Excellent)</li>
+                        <li>Uptime: 99.98% (Exceptional)</li>
+                        <li>Compliance Rate: 100%</li>
+                        <li>Memory Usage: Optimized</li>
+                    </ul>
+                    
+                    <p><strong>What's Next:</strong></p>
+                    <p>Your Risk Assessment Agent is now live and ready to start earning! It has been automatically deployed to the financial services marketplace and is available for banks, credit unions, and financial institutions to discover and integrate.</p>
+                    
+                    <p><strong>Earning Potential:</strong></p>
+                    <p>Based on similar risk assessment agents in the marketplace, you can expect to earn $400-800 per month initially, with potential for significant growth as adoption increases in the financial sector.</p>
+                    
+                    <p><strong>Market Opportunities:</strong></p>
+                    <ul>
+                        <li>Credit risk assessment for lending institutions</li>
+                        <li>Investment portfolio risk analysis</li>
+                        <li>Regulatory compliance monitoring</li>
+                        <li>Market volatility assessment</li>
+                    </ul>
+                    
+                    <p><strong>Support:</strong></p>
+                    <p>Our technical support team is available 24/7 to assist with any issues. You'll receive weekly performance reports and monthly earnings statements.</p>
+                    
+                    <p>Welcome to the certified financial services agent community! 🚀</p>
+                    
+                    <p><em>This message was generated by the Success Manager AI system.</em></p>
+                `
+            }
+        };
+        
+        // Modal functions
+        function openMessage(messageId) {
+            const message = messages[messageId];
+            if (message) {
+                document.getElementById('modalTitle').textContent = message.subject;
+                document.getElementById('modalSender').textContent = message.sender;
+                document.getElementById('modalTime').textContent = message.time;
+                document.getElementById('modalContent').innerHTML = message.content;
+                document.getElementById('messageModal').style.display = 'block';
+                
+                // Mark message as read
+                const messageElement = document.querySelector(`[onclick="openMessage(${messageId})"]`);
+                if (messageElement) {
+                    messageElement.classList.remove('unread');
+                }
+            }
+        }
+        
+        function closeMessage() {
+            document.getElementById('messageModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('messageModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Chart.js configuration
+        Chart.defaults.color = '#B0B0B0';
+        Chart.defaults.borderColor = 'rgba(0, 229, 255, 0.3)';
+        Chart.defaults.backgroundColor = 'rgba(0, 229, 255, 0.1)';
+        
+        // Common chart options
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#B0B0B0',
+                        font: {
+                            family: 'Inter, sans-serif'
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(0, 229, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#B0B0B0',
+                        font: {
+                            family: 'Inter, sans-serif'
+                        }
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(0, 229, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#B0B0B0',
+                        font: {
+                            family: 'Inter, sans-serif'
+                        }
+                    }
+                }
+            }
+        };
+        
+        // Generate monthly progression data (last 12 months)
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        
+        // Earnings data with overall upward trend but realistic fluctuations
+        const earningsData = [8200, 7150, 7350, 5300, 9450, 10400, 10600, 6550, 10700, 15500, 14000, 19050];
+        
+        // Active agents data with steady growth but some dips
+        const agentsData = [2, 4, 4, 4, 6, 6, 7, 8, 5, 8, 9, 12];
+        
+        // API calls data with growth but monthly variations
+        const apiCallsData = [650, 520, 700, 460, 620, 600, 680, 860, 720, 900, 980, 1234];
+        
+        // Initialize charts when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Earnings Chart
+            const earningsCtx = document.getElementById('earningsChart').getContext('2d');
+            new Chart(earningsCtx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Total Earnings ($)',
+                        data: earningsData,
+                        borderColor: '#00E5FF',
+                        backgroundColor: 'rgba(0, 229, 255, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#00E5FF',
+                        pointBorderColor: '#00E5FF',
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    ...chartOptions,
+                    plugins: {
+                        ...chartOptions.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Earnings: $' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Active Agents Chart
+            const agentsCtx = document.getElementById('agentsChart').getContext('2d');
+            new Chart(agentsCtx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Active Agents',
+                        data: agentsData,
+                        backgroundColor: 'rgba(255, 20, 147, 0.6)',
+                        borderColor: '#FF1493',
+                        borderWidth: 2,
+                        borderRadius: 4,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    ...chartOptions,
+                    plugins: {
+                        ...chartOptions.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Active Agents: ' + context.parsed.y;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // API Calls Chart
+            const apiCallsCtx = document.getElementById('apiCallsChart').getContext('2d');
+            new Chart(apiCallsCtx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'API Calls',
+                        data: apiCallsData,
+                        borderColor: '#FFD700',
+                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#FFD700',
+                        pointBorderColor: '#FFD700',
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    ...chartOptions,
+                    plugins: {
+                        ...chartOptions.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'API Calls: ' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
