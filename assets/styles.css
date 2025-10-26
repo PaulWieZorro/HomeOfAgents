@@ -255,6 +255,109 @@ nav {
   flex-wrap: wrap;
 }
 
+/* Contact Section */
+.contact-section {
+  padding: 20px 0 100px;
+  text-align: center;
+  position: relative;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.contact-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.contact-section h2 {
+  font-size: 36px;
+  margin-bottom: 40px;
+  background: linear-gradient(90deg, var(--light), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.contact-form-grid {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.contact-section .form-field {
+  margin: 0;
+}
+
+.contact-section .form-field input {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  background: rgba(10, 17, 40, 0.8);
+  color: var(--light);
+  font-size: 16px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  font-family: 'Inter', sans-serif;
+}
+
+.contact-section .form-field input:focus {
+  outline: none;
+  border-color: var(--cyan);
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+}
+
+.contact-section .form-field input::placeholder {
+  color: var(--silver);
+}
+
+.contact-section .checkbox-field {
+  max-width: 600px;
+  margin: 0 auto 32px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contact-section #contact-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.contact-section #contact-form button[type="submit"] {
+  width: 100%;
+  padding: 14px 48px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.contact-section .checkbox-field label {
+  display: inline-flex;
+  align-items: center;
+  color: var(--silver);
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.contact-section .checkbox-field input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--cyan);
+}
+
+@media (max-width: 768px) {
+  .contact-section h2 {
+    font-size: 28px;
+  }
+}
+
 /* User Type Toggle */
 .user-type-toggle {
   display: flex;
