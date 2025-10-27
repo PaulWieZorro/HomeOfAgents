@@ -192,6 +192,94 @@ class DatabaseManager {
             throw error;
         }
     }
+
+    // Create agent in marketplace
+    async createAgent(agentData) {
+        try {
+            // Get current user
+            const user = this.authManager.getCurrentUser();
+            if (!user) {
+                throw new Error('User must be authenticated to create agents');
+            }
+
+            // Prepare agent data for database
+            const agent = {
+                name: agentData.name,
+                category: agentData.category,
+                description: agentData.description,
+                short_description: agentData.short_description || agentData.description.substring(0, 500),
+                
+                // Pricing
+                price_yearly: parseFloat(agentData.price_yearly) || 0,
+                price_currency: 'USD',
+                trial_period_days: parseInt(agentData.trial_period_days) || 30,
+                demo_available: agentData.demo_available === 'true' || agentData.demo_available === true,
+                
+                // Default ratings (new agents start at 0)
+                rating: null,
+                reviews_count: 0,
+                verified_status: false,
+                
+                // Compliance & Security
+                compliance_level: agentData.compliance_level || 'standard',
+                compliance_standards: agentData.compliance_standards || [],
+                data_security_rating: agentData.data_security_rating || null,
+                certifications: [],
+                
+                // Technical
+                integration_options: agentData.integration_options || [],
+                deployment_type: agentData.deployment_type || 'cloud',
+                api_type: agentData.api_type || null,
+                api_documentation_url: agentData.api_documentation_url || null,
+                
+                // Performance & SLA
+                sla_uptime_percentage: agentData.sla_uptime_percentage ? parseFloat(agentData.sla_uptime_percentage) : null,
+                guaranteed_response_time_ms: agentData.guaranteed_response_time_ms ? parseInt(agentData.guaranteed_response_time_ms) : null,
+                max_concurrent_users: agentData.max_concurrent_users ? parseInt(agentData.max_concurrent_users) : null,
+                monthly_api_call_limit: agentData.monthly_api_call_limit ? parseInt(agentData.monthly_api_call_limit) : null,
+                
+                // Support
+                support_level: agentData.support_level || null,
+                support_channels: agentData.support_channels || [],
+                language_support: agentData.language_support || [],
+                
+                // Vendor
+                vendor_name: agentData.vendor_name,
+                vendor_url: agentData.vendor_url || null,
+                vendor_email: agentData.vendor_email || null,
+                vendor_location: agentData.vendor_location || null,
+                
+                // Additional
+                use_cases: agentData.use_cases || [],
+                key_features: agentData.key_features || [],
+                capabilities: agentData.capabilities || [],
+                
+                // Search
+                search_keywords: agentData.search_keywords || [],
+                tags: [agentData.category],
+                featured: false,
+                popular: false,
+                
+                // Audit
+                created_by: user.id,
+                status: 'pending' // New agents need approval
+            };
+
+            const { data, error } = await supabase
+                .from('agents')
+                .insert([agent])
+                .select();
+
+            if (error) {
+                throw error;
+            }
+
+            return data[0];
+        } catch (error) {
+            console.error('Agent creation error:', error);
+            throw error;
+        }
+    }
 }
 
 // Initialize managers
