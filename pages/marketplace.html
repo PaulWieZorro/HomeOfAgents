@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace - Agentryxx</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .marketplace-header {
+            margin-bottom: 40px;
+        }
+
+        .search-filters-container {
+            background: rgba(46, 46, 46, 0.3);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 32px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(10, 17, 40, 0.8);
+            color: var(--light);
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--cyan);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-label {
+            color: var(--cyan);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .filter-select {
+            padding: 8px 16px;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(10, 17, 40, 0.8);
+            color: var(--light);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:hover {
+            border-color: var(--cyan);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--cyan);
+        }
+
+        .marketplace-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .agent-card {
+            background: rgba(46, 46, 46, 0.2);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--pink), var(--cyan));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--cyan);
+            box-shadow: 0 8px 32px rgba(0, 229, 255, 0.2);
+        }
+
+        .agent-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .agent-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .agent-category {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .category-banking {
+            background: rgba(0, 229, 255, 0.2);
+            color: var(--cyan);
+            border: 1px solid var(--cyan);
+        }
+
+        .category-insurance {
+            background: rgba(255, 20, 147, 0.2);
+            color: var(--pink);
+            border: 1px solid var(--pink);
+        }
+
+        .category-risk {
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+            border: 1px solid #FFD700;
+        }
+
+        .category-support {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00FF88;
+            border: 1px solid #00FF88;
+        }
+
+        .category-compliance {
+            background: rgba(255, 140, 0, 0.2);
+            color: #FF8C00;
+            border: 1px solid #FF8C00;
+        }
+
+        .agent-name {
+            color: var(--cyan);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .agent-description {
+            color: var(--silver);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            min-height: 48px;
+        }
+
+        .agent-stats {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 229, 255, 0.1);
+            font-size: 12px;
+            color: var(--silver);
+        }
+
+        .agent-price {
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        .create-agent-card {
+            background: rgba(46, 46, 46, 0.15);
+            border: 2px dashed rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 280px;
+            text-align: center;
+        }
+
+        .create-agent-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--cyan);
+            background: rgba(0, 229, 255, 0.05);
+            box-shadow: 0 8px 32px rgba(0, 229, 255, 0.2);
+        }
+
+        .create-icon {
+            font-size: 64px;
+            color: var(--cyan);
+            margin-bottom: 16px;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .create-agent-card:hover .create-icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .create-title {
+            color: var(--cyan);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .create-description {
+            color: var(--silver);
+            font-size: 14px;
+        }
+
+        .results-count {
+            color: var(--silver);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--silver);
+        }
+
+        .no-results-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">Agentry<span class="xx">xx</span></div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <a href="dashboard_company.html" class="btn btn-secondary">Back to Dashboard</a>
+                <a href="login.html" class="btn btn-secondary">Logout</a>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <h1>AI Agent Marketplace</h1>
+            <p>Discover and deploy powerful AI agents built by experts</p>
+        </section>
+
+        <div class="search-filters-container">
+            <input type="text" 
+                   class="search-bar" 
+                   id="searchInput" 
+                   placeholder="Search for agents by name, description, or category...">
+            
+            <div class="filters-row">
+                <div class="filter-group">
+                    <span class="filter-label">Category:</span>
+                    <select class="filter-select" id="categoryFilter">
+                        <option value="all">All Categories</option>
+                        <option value="banking">Banking</option>
+                        <option value="insurance">Insurance</option>
+                        <option value="risk">Risk & Compliance</option>
+                        <option value="support">Support & Strategy</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Status:</span>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="popular">Popular</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Sort by:</span>
+                    <select class="filter-select" id="sortFilter">
+                        <option value="name">Name (A-Z)</option>
+                        <option value="price">Price (Low-High)</option>
+                        <option value="popular">Most Popular</option>
+                    </select>
+                </div>
+
+                <div style="margin-left: auto;">
+                    <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-count" id="resultsCount"></div>
+
+        <div class="marketplace-grid" id="marketplaceGrid">
+            <!-- Banking Agents -->
+            <div class="agent-card" data-category="banking" data-name="Banking Compliance Monitor" data-price="Premium">
+                <div class="agent-card-header">
+                    <span class="agent-category category-banking">Banking</span>
+                </div>
+                <h3 class="agent-name">Banking Compliance Monitor</h3>
+                <p class="agent-description">Automatically monitors transactions for AML compliance, flags suspicious activities, and generates regulatory reports for banking institutions.</p>
+                <div class="agent-stats">
+                    <span>✓ Verified</span>
+                    <span class="agent-price">Premium</span>
+                </div>
+            </div>
+
+            <div class="agent-card" data-category="banking" data-name="Credit Risk Analyzer" data-price="Premium">
+                <div class="agent-card-header">
+                    <span class="agent-category category-banking">Banking</span>
+                </div>
+                <h3 class="agent-name">Credit Risk Analyzer</h3>
+                <p class="agent-description">Evaluates loan applications, assesses creditworthiness, calculates risk scores, and provides automated lending decisions for financial institutions.</p>
+                <div class="agent-stats">
+                    <span>✓ Verified</span>
+                    <span class="agent-price">Premium</span>
+                </div>
+            </div>
+
+            <div class="agent-card" data-category="banking" data-name="Fraud Detection System" data-price="Premium">
+                <div class="agent-card-header">
+                    <span class="agent-category category-banking">Banking</span>
+                </div>
+                <h3 class="agent-name">Fraud Detection System</h3>
+                <p class="agent-description">Real-time monitoring of banking transactions, credit card activities, and insurance claims to detect and prevent fraudulent activities.</p>
+                <div class="agent-stats">
+                    <span>✓ Verified</span>
+                    <span class="agent-price">Premium</span>
+                </div>
+            </div>
+
+            <div class="agent-card" data-category="banking" data-name="Regulatory Reporting Bot" data-price="Premium">
+                <div class="agent-card-header">
+                    <span class="agent-category category-compliance">Compliance</span>
+                </div>
+                <h3 class="agent-name">Regulatory Reporting Bot</h3>
+                <p class="agent-description">Generates automated regulatory reports for banks and insurance companies, ensuring compliance with FDIC, SEC, and state insurance regulations.</p>
+                <div class="agent-stats">
+                    <span>✓ Verified</span>
+                    <span class="agent-price">Premium</span>
+                </div>
+            </div>
+
+            <!-- Insurance Agents -->
+            <div class="agent-card" data-category="insurance" data-name="Insurance Claims Assessor" data-price="Premium">
+                <div class="agent-card-header">
+                    <span class="agent-category category-insurance">Insurance</span>
+                </div>
+                <h3 class="agent-name">Insurance Claims Assessor</h3>
+                <p class="agent-description">Analyzes insurance claims, validates policy coverage, calculates settlements, and processes automated claim approvals for insurance companies.</p>
+                <div class="agent-stats">
+                    <span>✓ Verified</span>
+                    <span class="agent-price">Premium</span>
+                </div>
+            </div>
+
+            <div class="agent-card" data-category="insurance" data-name="Policy Underwriting Assistant" data-price="Premium">
+                <div class="agent-card-header">
+                    <span class="agent-category category-insurance">Insurance</span>
+                </div>
+                <h3 class="agent-name">Policy Underwriting Assistant</h3>
+                <p class="agent-description">Automates insurance policy underwriting processes, evaluates risk factors, calculates premiums, and generates policy recommendations.</p>
+                <div class="agent-stats">
+                    <span>✓ Verified</span>
+                    <span class="agent-price">Premium</span>
+                </div>
+            </div>
+
+            <!-- Risk Agents -->
+            <div class="agent-card" data-category="risk" data-name="Risk Assessment Agent" data-price="Premium">
+                <div class="agent-card-header">
+                    <span class="agent-category category-risk">Risk Analysis</span>
+                </div>
+                <h3 class="agent-name">Risk Assessment Agent</h3>
+                <p class="agent-description">Analyzes credit risk, market volatility, and compliance requirements for financial institutions.</p>
+                <div class="agent-stats">
+                    <span>✓ Verified</span>
+                    <span class="agent-price">Premium</span>
+                </div>
+            </div>
+
+            <!-- Support Agents -->
+            <div class="agent-card" data-category="support" data-name="Wealth Management Support Agent" data-price="Premium">
+                <div class="agent-card-header">
+                    <span class="agent-category category-support">Support</span>
+                </div>
+                <h3 class="agent-name">Wealth Management Support Agent</h3>
+                <p class="agent-description">Guarantees 24/7 availability to wealthy customers, answers every question that has ever been answered to a client, learns from internal documents.</p>
+                <div class="agent-stats">
+                    <span>✓ Verified</span>
+                    <span class="agent-price">Premium</span>
+                </div>
+            </div>
+
+            <div class="agent-card" data-category="support" data-name="Internal Strategy & Planning Support Agent" data-price="Premium">
+                <div class="agent-card-header">
+                    <span class="agent-category category-support">Support</span>
+                </div>
+                <h3 class="agent-name">Internal Strategy & Planning Support Agent</h3>
+                <p class="agent-description">Helps Staff with every decision and project proposal to fit into the company's strategy.</p>
+                <div class="agent-stats">
+                    <span>✓ Verified</span>
+                    <span class="agent-price">Premium</span>
+                </div>
+            </div>
+
+            <!-- Create New Agent Card -->
+            <div class="create-agent-card" onclick="window.location.href='create-agent.html'">
+                <div class="create-icon">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                <h3 class="create-title">Create Custom Agent</h3>
+                <p class="create-description">Build your own AI agent tailored to your unique business needs</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/starfield.js"></script>
+    <script src="../assets/toaster.js"></script>
+    <script src="../assets/app.js"></script>
+    
+    <script>
+        // Marketplace filtering and search functionality
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const sortFilter = document.getElementById('sortFilter');
+        const resultsCount = document.getElementById('resultsCount');
+        const marketplaceGrid = document.getElementById('marketplaceGrid');
+        
+        const agentCards = document.querySelectorAll('.agent-card');
+        const createAgentCard = document.querySelector('.create-agent-card');
+        
+        function filterAgents() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const category = categoryFilter.value;
+            const status = statusFilter.value;
+            
+            let visibleCount = 0;
+            let hiddenCount = 0;
+            
+            agentCards.forEach(card => {
+                const name = card.dataset.name.toLowerCase();
+                const description = card.querySelector('.agent-description').textContent.toLowerCase();
+                const cardCategory = card.dataset.category;
+                
+                // Search filter
+                const matchesSearch = name.includes(searchTerm) || description.includes(searchTerm);
+                
+                // Category filter
+                const matchesCategory = category === 'all' || cardCategory === category;
+                
+                // Status filter (placeholder - can be enhanced)
+                const matchesStatus = status === 'all' || status === 'active' || status === 'popular';
+                
+                if (matchesSearch && matchesCategory && matchesStatus) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                    hiddenCount++;
+                }
+            });
+            
+            // Update results count
+            const totalCount = agentCards.length;
+            resultsCount.textContent = `Showing ${visibleCount} of ${totalCount} agents`;
+            
+            // Show/hide create agent card
+            if (visibleCount > 0 || !searchTerm && category === 'all') {
+                createAgentCard.style.display = 'flex';
+            } else {
+                createAgentCard.style.display = 'none';
+            }
+            
+            // Show no results message
+            if (visibleCount === 0 && (searchTerm || category !== 'all')) {
+                if (!document.querySelector('.no-results')) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'no-results';
+                    noResults.innerHTML = `
+                        <div class="no-results-icon">🔍</div>
+                        <h3 style="color: var(--cyan); margin-bottom: 8px;">No agents found</h3>
+                        <p>Try adjusting your search or filters</p>
+                    `;
+                    marketplaceGrid.appendChild(noResults);
+                }
+            } else {
+                const noResults = document.querySelector('.no-results');
+                if (noResults) {
+                    noResults.remove();
+                }
+            }
+            
+            // Sort results if needed
+            sortAgents();
+        }
+        
+        function sortAgents() {
+            const sortBy = sortFilter.value;
+            const cards = Array.from(agentCards).filter(card => card.style.display !== 'none');
+            
+            if (sortBy === 'name') {
+                cards.sort((a, b) => a.dataset.name.localeCompare(b.dataset.name));
+            } else if (sortBy === 'price') {
+                // Simple alphabetical sort for price labels
+                cards.sort((a, b) => a.dataset.name.localeCompare(b.dataset.name));
+            } else if (sortBy === 'popular') {
+                // For now, just shuffle or keep current order
+                // This can be enhanced with actual popularity data
+            }
+            
+            // Reorder cards in DOM
+            cards.forEach(card => {
+                marketplaceGrid.appendChild(card);
+            });
+            
+            // Always keep create agent card at the end
+            marketplaceGrid.appendChild(createAgentCard);
+        }
+        
+        function resetFilters() {
+            searchInput.value = '';
+            categoryFilter.value = 'all';
+            statusFilter.value = 'all';
+            sortFilter.value = 'name';
+            filterAgents();
+        }
+        
+        // Event listeners
+        searchInput.addEventListener('input', filterAgents);
+        categoryFilter.addEventListener('change', filterAgents);
+        statusFilter.addEventListener('change', filterAgents);
+        sortFilter.addEventListener('change', filterAgents);
+        
+        // Initialize results count
+        filterAgents();
+    </script>
+</body>
+</html>
+
