@@ -25,63 +25,137 @@ document.addEventListener('DOMContentLoaded', function() {
   // Handle contact form
   const contactForm = document.querySelector('#contact-form');
   if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
+    contactForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       
-      const email = this.querySelector('input[name="email"]').value.trim();
-      const gdpr = this.querySelector('input[name="gdpr"]').checked;
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
       
-      // Validate email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!email || !emailRegex.test(email)) {
-        alert('Please enter a valid email address');
-        return;
+      try {
+        const email = this.querySelector('input[name="email"]').value.trim();
+        const gdpr = this.querySelector('input[name="gdpr"]').checked;
+        
+        // Validate email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+          alert('Please enter a valid email address');
+          return;
+        }
+        
+        // Validate GDPR checkbox
+        if (!gdpr) {
+          alert('Please consent to GDPR to proceed');
+          return;
+        }
+        
+        // Collect form data
+        const formData = {
+          email: email,
+          name: this.querySelector('input[name="name"]').value.trim() || null,
+          contact: this.querySelector('input[name="contact"]').value.trim() || null,
+          gdpr_consent: gdpr,
+          source: 'contact_form'
+        };
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+        
+        // Submit to Supabase
+        const { data, error } = await supabase
+          .from('contact_interest')
+          .insert([formData])
+          .select();
+        
+        if (error) {
+          console.error('Contact form submission error:', error);
+          throw error;
+        }
+        
+        // Show success message
+        if (typeof showToast === 'function') {
+          showToast('Thank you for your interest! We\'ll be in touch soon.', 'success');
+        } else {
+          alert('Thank you for your interest! We\'ll be in touch soon.');
+        }
+        
+        // Reset form
+        this.reset();
+        
+      } catch (error) {
+        console.error('Contact form submission error:', error);
+        alert('Failed to submit. Please try again later.');
+      } finally {
+        // Restore button state
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
       }
-      
-      // Validate GDPR checkbox
-      if (!gdpr) {
-        alert('Please consent to GDPR to proceed');
-        return;
-      }
-      
-      // Collect form data
-      const formData = {
-        email: email,
-        name: this.querySelector('input[name="name"]').value.trim(),
-        contact: this.querySelector('input[name="contact"]').value.trim(),
-        gdpr: gdpr
-      };
-      
-      // Here you would typically send the data to your backend
-      // For now, we'll just show a success message
-      console.log('Contact form submitted:', formData);
-      
-      // Show success message
-      alert('Thank you for your interest! We\'ll be in touch soon.');
-      
-      // Reset form
-      this.reset();
     });
   }
   
   // Handle subscription form only (not login/registration forms)
   const subscriptionForm = document.querySelector('#subscribe form');
   if (subscriptionForm) {
-    subscriptionForm.addEventListener('submit', function(e) {
+    subscriptionForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       
-      // Basic form validation and submission handling
-      const email = this.querySelector('input[type="email"]');
-      if (email && !email.value) {
-        alert('Please enter a valid email address');
-        return;
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      
+      try {
+        // Get email and validate
+        const emailInput = this.querySelector('input[type="email"]');
+        const email = emailInput.value.trim();
+        
+        // Validate email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+          alert('Please enter a valid email address');
+          return;
+        }
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Subscribing...';
+        
+        // Prepare subscription data
+        const formData = {
+          email: email,
+          name: null,
+          contact: null,
+          gdpr_consent: true, // Assumed consent for newsletter
+          source: 'subscribe'
+        };
+        
+        // Submit to Supabase
+        const { data, error } = await supabase
+          .from('contact_interest')
+          .insert([formData])
+          .select();
+        
+        if (error) {
+          console.error('Subscription error:', error);
+          throw error;
+        }
+        
+        // Show success message
+        if (typeof showToast === 'function') {
+          showToast('Thank you for subscribing! We\'ll keep you posted.', 'success');
+        } else {
+          alert('Thank you for subscribing! We\'ll keep you posted.');
+        }
+        
+        // Reset form
+        this.reset();
+        
+      } catch (error) {
+        console.error('Subscription error:', error);
+        alert('Failed to subscribe. Please try again later.');
+      } finally {
+        // Restore button state
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
       }
-      
-      // Show success message
-      alert('Thank you for subscribing! We\'ll keep you posted.');
-      
-      // Reset form
-      this.reset();
     });
   }
   
