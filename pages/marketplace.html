@@ -785,6 +785,10 @@
         <nav>
             <div class="logo">Agentry<span class="xx">xx</span></div>
             <div style="display: flex; gap: 12px; align-items: center;">
+                <button class="cart-btn" onclick="openWalletModal()" title="My Wallet">
+                    <i class="fas fa-wallet"></i>
+                    <span class="cart-badge" id="tokenBalance">0</span>
+                </button>
                 <button class="cart-btn" onclick="openOrderHistory()" title="Order History">
                     <i class="fas fa-history"></i>
                 </button>
@@ -1049,6 +1053,39 @@
         </div>
         <div class="cart-content" id="orderHistoryContent">
             <!-- Order history will be populated here -->
+        </div>
+    </div>
+
+    <!-- Wallet Balance Modal (Simple View) -->
+    <div id="walletBalanceModal" class="cart-modal">
+        <div class="cart-modal-header">
+            <h2 class="cart-modal-title">My Wallet</h2>
+            <span class="cart-close" onclick="closeWalletModal()">&times;</span>
+        </div>
+        <div class="cart-content" id="walletBalanceContent" style="padding: 24px;">
+            <!-- Wallet balance will be populated here -->
+        </div>
+    </div>
+
+    <!-- Transaction History Modal -->
+    <div id="transactionHistoryModal" class="cart-modal">
+        <div class="cart-modal-header">
+            <h2 class="cart-modal-title">Transaction History</h2>
+            <span class="cart-close" onclick="closeTransactionHistoryModal()">&times;</span>
+        </div>
+        <div class="cart-content" id="transactionHistoryContent">
+            <!-- Transaction history will be populated here -->
+        </div>
+    </div>
+
+    <!-- Top Up Confirmation Modal -->
+    <div id="topUpModal" class="cart-modal" style="display: none;">
+        <div class="cart-modal-header">
+            <h2 class="cart-modal-title">Top Up Wallet</h2>
+            <span class="cart-close" onclick="closeTopUpModal()">&times;</span>
+        </div>
+        <div class="cart-content" id="topUpContent" style="padding: 24px;">
+            <!-- Top up content will be populated here -->
         </div>
     </div>
 
@@ -2038,6 +2075,505 @@
             }
         }
         
+        // Open transaction history modal
+        async function openTransactionHistory() {
+            try {
+                // Check if managers are available
+                if (typeof authManager === 'undefined' || typeof databaseManager === 'undefined') {
+                    console.error('Authentication or database managers not loaded');
+                    return;
+                }
+
+                const modal = document.getElementById('transactionHistoryModal');
+                const content = document.getElementById('transactionHistoryContent');
+                
+                if (!modal || !content) return;
+
+                // Show loading
+                content.innerHTML = `
+                    <div class="cart-empty">
+                        <div class="cart-empty-icon">⏳</div>
+                        <p>Loading transaction history...</p>
+                    </div>
+                `;
+
+                modal.classList.add('open');
+
+                // Get current user ID
+                const user = authManager.getCurrentUser();
+                if (!user) {
+                    content.innerHTML = `
+                        <div class="cart-empty">
+                            <div class="cart-empty-icon">⚠️</div>
+                            <p>Please login to view transaction history</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Get user balance first
+                const { data: balance, error: balanceError } = await databaseManager.getUserTokenBalance(user.id);
+                const currentBalance = balance || 0;
+
+                // Fetch transactions
+                const { data: transactions, error: txError } = await databaseManager.getTransactionHistory(user.id, 50);
+
+                if (txError) {
+                    console.error('Error fetching transactions:', txError);
+                    throw txError;
+                }
+
+                if (!transactions || transactions.length === 0) {
+                    content.innerHTML = `
+                        <div class="no-orders">
+                            <div class="no-orders-icon">💰</div>
+                            <h3 style="color: var(--cyan); margin-bottom: 8px;">No transactions yet</h3>
+                            <p style="margin-bottom: 20px;">Your token transactions will appear here</p>
+                            <div style="background: rgba(0, 229, 255, 0.1); padding: 16px; border-radius: 8px; border: 1px solid rgba(0, 229, 255, 0.3);">
+                                <strong style="color: var(--cyan);">Current Balance:</strong>
+                                <div style="font-size: 24px; color: var(--pink); margin-top: 8px;">${formatPrice(currentBalance)}</div>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Render transactions
+                const transactionsHTML = `
+                    <div style="background: rgba(0, 229, 255, 0.1); padding: 16px; border-radius: 8px; margin-bottom: 24px; border: 1px solid rgba(0, 229, 255, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: var(--cyan);">Current Balance:</strong>
+                                <div style="font-size: 24px; color: var(--pink); margin-top: 8px;">${formatPrice(currentBalance)}</div>
+                            </div>
+                            <button onclick="openTopUpModal(); closeTransactionHistoryModal();" class="btn btn-primary" style="padding: 10px 20px;">
+                                <i class="fas fa-plus"></i> Top Up
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        ${transactions.map(tx => {
+                            const date = new Date(tx.tx_timestamp);
+                            const formattedDate = date.toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'short', 
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+
+                            const isPositive = parseFloat(tx.amount) > 0;
+                            const amountClass = isPositive ? 'var(--cyan)' : 'var(--pink)';
+                            const symbol = isPositive ? '+' : '';
+
+                            return `
+                                <div class="order-card" style="margin-bottom: 12px;">
+                                    <div class="order-header">
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 600; color: ${amountClass}; font-size: 18px;">
+                                                ${symbol}${formatPrice(tx.amount)}
+                                            </div>
+                                            <div style="font-size: 14px; color: var(--light); opacity: 0.7; margin-top: 4px;">
+                                                ${formattedDate}
+                                            </div>
+                                            <div style="font-size: 13px; color: var(--light); opacity: 0.8; margin-top: 8px;">
+                                                ${tx.type} • ${tx.description || 'No description'}
+                                            </div>
+                                            ${tx.order_number ? `<div style="font-size: 12px; color: var(--cyan); margin-top: 4px;">Order: ${tx.order_number}</div>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+
+                content.innerHTML = transactionsHTML;
+            } catch (error) {
+                console.error('Error loading transaction history:', error);
+                const content = document.getElementById('transactionHistoryContent');
+                if (content) {
+                    content.innerHTML = `
+                        <div class="cart-empty">
+                            <div class="cart-empty-icon">⚠️</div>
+                            <h3 style="color: var(--pink); margin-bottom: 8px;">Error loading transactions</h3>
+                            <p>Please try again later</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Close transaction history modal
+        function closeTransactionHistoryModal() {
+            const modal = document.getElementById('transactionHistoryModal');
+            if (modal) {
+                modal.classList.remove('open');
+            }
+        }
+
+        // Open wallet modal (simple balance view)
+        async function openWalletModal() {
+            try {
+                const modal = document.getElementById('walletBalanceModal');
+                const content = document.getElementById('walletBalanceContent');
+                
+                if (!modal || !content) return;
+
+                // Show loading
+                content.innerHTML = `
+                    <div class="cart-empty">
+                        <div class="cart-empty-icon">⏳</div>
+                        <p>Loading wallet...</p>
+                    </div>
+                `;
+
+                modal.classList.add('open');
+
+                // Check if authManager and databaseManager are available
+                if (typeof authManager === 'undefined' || !authManager) {
+                    console.error('authManager is not defined');
+                    content.innerHTML = `
+                        <div class="cart-empty">
+                            <div class="cart-empty-icon">⚠️</div>
+                            <h3 style="color: var(--pink); margin-bottom: 8px;">Configuration Error</h3>
+                            <p style="color: var(--silver); font-size: 14px; margin-bottom: 16px;">
+                                Authentication manager not loaded. Please refresh the page.
+                            </p>
+                            <button class="btn btn-primary" onclick="location.reload()" style="padding: 12px 24px;">
+                                Refresh Page
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (typeof databaseManager === 'undefined' || !databaseManager) {
+                    console.error('databaseManager is not defined');
+                    content.innerHTML = `
+                        <div class="cart-empty">
+                            <div class="cart-empty-icon">⚠️</div>
+                            <h3 style="color: var(--pink); margin-bottom: 8px;">Configuration Error</h3>
+                            <p style="color: var(--silver); font-size: 14px; margin-bottom: 16px;">
+                                Database manager not loaded. Please refresh the page.
+                            </p>
+                            <button class="btn btn-primary" onclick="location.reload()" style="padding: 12px 24px;">
+                                Refresh Page
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Get current user ID
+                const user = authManager.getCurrentUser();
+                console.log('Current user:', user); // Debug log
+                if (!user) {
+                    content.innerHTML = `
+                        <div class="cart-empty">
+                            <div class="cart-empty-icon">⚠️</div>
+                            <h3 style="color: var(--pink); margin-bottom: 8px;">Please Login</h3>
+                            <p>Please login to view your wallet</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Get user balance
+                console.log('Fetching balance for user:', user.id); // Debug log
+                const { data: currentBalance, error: balanceError } = await databaseManager.getUserTokenBalance(user.id);
+                console.log('Balance result:', { currentBalance, balanceError }); // Debug log
+                
+                if (balanceError) {
+                    console.error('Error fetching balance:', balanceError);
+                    content.innerHTML = `
+                        <div class="cart-empty">
+                            <div class="cart-empty-icon">⚠️</div>
+                            <h3 style="color: var(--pink); margin-bottom: 8px;">Database Error</h3>
+                            <p style="color: var(--silver); font-size: 12px; margin-bottom: 16px;">
+                                Error: ${balanceError.message || 'Unknown error'}
+                            </p>
+                            <p style="color: var(--light); font-size: 14px;">
+                                Make sure the wallet system is properly set up.
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const balance = currentBalance || 0;
+
+                // Show wallet balance with top up button
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div style="background: rgba(0, 229, 255, 0.1); padding: 32px; border-radius: 16px; border: 2px solid rgba(0, 229, 255, 0.3); margin-bottom: 32px;">
+                            <div style="font-size: 20px; color: var(--light); opacity: 0.8; margin-bottom: 16px;">Current Balance</div>
+                            <div style="font-size: 56px; font-weight: bold; color: var(--cyan); margin-bottom: 8px;">${formatPrice(balance)}</div>
+                            <div style="font-size: 14px; color: var(--silver); opacity: 0.7;">Available for purchases</div>
+                        </div>
+
+                        <div style="display: flex; gap: 12px; justify-content: center; margin-bottom: 24px;">
+                            <button class="btn btn-primary" onclick="openTopUpModal(); closeWalletModal();" style="padding: 16px 32px; font-size: 16px; min-width: 160px;">
+                                <i class="fas fa-plus"></i> Top Up
+                            </button>
+                            <button class="btn btn-secondary" onclick="openTransactionHistoryFromWallet()" style="padding: 16px 32px; font-size: 16px; min-width: 160px;">
+                                <i class="fas fa-history"></i> Transactions
+                            </button>
+                        </div>
+
+                        <div style="background: rgba(255, 0, 150, 0.05); border: 1px solid rgba(255, 0, 150, 0.2); border-radius: 12px; padding: 20px; margin-top: 24px;">
+                            <h4 style="color: var(--cyan); margin-bottom: 12px; font-size: 16px;">Quick Top Up</h4>
+                            <p style="color: var(--silver); font-size: 14px; margin-bottom: 16px; opacity: 0.8;">
+                                Add 100,000 tokens to your wallet instantly
+                            </p>
+                            <button class="btn btn-primary" onclick="quickTopUp()" style="width: 100%; padding: 12px; font-size: 14px;">
+                                <i class="fas fa-plus-circle"></i> Add 100,000 Tokens
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error opening wallet modal:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name
+                });
+                const content = document.getElementById('walletBalanceContent');
+                if (content) {
+                    content.innerHTML = `
+                        <div class="cart-empty">
+                            <div class="cart-empty-icon">⚠️</div>
+                            <h3 style="color: var(--pink); margin-bottom: 8px;">Error</h3>
+                            <p style="color: var(--silver); margin-bottom: 8px;">
+                                ${error.message || 'Failed to load wallet'}
+                            </p>
+                            <p style="color: var(--light); font-size: 12px; opacity: 0.8;">
+                                Check browser console for details
+                            </p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Close wallet modal
+        function closeWalletModal() {
+            const modal = document.getElementById('walletBalanceModal');
+            if (modal) {
+                modal.classList.remove('open');
+            }
+        }
+
+        // Open transaction history from wallet
+        async function openTransactionHistoryFromWallet() {
+            closeWalletModal();
+            await openTransactionHistory();
+        }
+
+        // Quick top up (directly adds tokens without confirmation)
+        async function quickTopUp() {
+            try {
+                // Check if managers are available
+                if (typeof authManager === 'undefined' || typeof databaseManager === 'undefined') {
+                    console.error('Authentication or database managers not loaded');
+                    if (typeof showToast !== 'undefined') {
+                        showToast('System not ready. Please refresh the page.', 'error');
+                    }
+                    return;
+                }
+
+                const user = authManager.getCurrentUser();
+                if (!user) {
+                    alert('Please login to top up your wallet');
+                    return;
+                }
+
+                // Add 100,000 tokens
+                const { data: transactionId, error } = await databaseManager.addTokens(
+                    user.id,
+                    100000,
+                    'Quick wallet top up',
+                    null
+                );
+
+                if (error) {
+                    throw error;
+                }
+
+                // Update balance display
+                await updateTokenBalance();
+
+                // Refresh wallet modal to show new balance
+                await openWalletModal();
+
+                // Show success notification
+                if (typeof showToast !== 'undefined') {
+                    showToast('100,000 tokens added to your wallet!', 'success');
+                }
+            } catch (error) {
+                console.error('Error in quick top up:', error);
+                if (typeof showToast !== 'undefined') {
+                    showToast('Failed to add tokens. Please try again.', 'error');
+                }
+            }
+        }
+
+        // Open top up modal
+        async function openTopUpModal() {
+            try {
+                // Check if managers are available
+                if (typeof authManager === 'undefined' || typeof databaseManager === 'undefined') {
+                    console.error('Authentication or database managers not loaded');
+                    if (typeof showToast !== 'undefined') {
+                        showToast('System not ready. Please refresh the page.', 'error');
+                    }
+                    return;
+                }
+
+                const modal = document.getElementById('topUpModal');
+                const content = document.getElementById('topUpContent');
+                
+                if (!modal || !content) return;
+
+                // Get current user ID
+                const user = authManager.getCurrentUser();
+                if (!user) {
+                    alert('Please login to top up your wallet');
+                    return;
+                }
+
+                // Get user balance first
+                const { data: currentBalance, error: balanceError } = await databaseManager.getUserTokenBalance(user.id);
+                const balance = currentBalance || 0;
+
+                // Show top up modal content
+                content.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="background: rgba(0, 229, 255, 0.1); padding: 24px; border-radius: 12px; border: 1px solid rgba(0, 229, 255, 0.3); margin-bottom: 24px;">
+                            <div style="font-size: 16px; color: var(--light); opacity: 0.8; margin-bottom: 12px;">Current Balance</div>
+                            <div style="font-size: 36px; font-weight: bold; color: var(--cyan);">${formatPrice(balance)}</div>
+                        </div>
+
+                        <div style="margin-bottom: 32px;">
+                            <h3 style="color: var(--cyan); margin-bottom: 16px;">Add Tokens to Wallet</h3>
+                            <p style="color: var(--light); opacity: 0.8; margin-bottom: 24px;">Top up amount: <strong style="color: var(--pink);">100,000 tokens</strong></p>
+                            
+                            <div style="background: rgba(255, 0, 150, 0.1); padding: 16px; border-radius: 8px; border: 1px solid rgba(255, 0, 150, 0.3); margin-bottom: 24px;">
+                                <div style="color: var(--light); opacity: 0.8; margin-bottom: 8px;">New Balance After Top Up:</div>
+                                <div style="font-size: 24px; font-weight: bold; color: var(--pink);">${formatPrice(balance + 100000)}</div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" onclick="confirmTopUp()" style="width: 100%; padding: 16px; font-size: 16px;">
+                            <i class="fas fa-wallet"></i> Confirm Top Up Wallet
+                        </button>
+
+                        <button class="btn btn-secondary" onclick="closeTopUpModal()" style="width: 100%; padding: 16px; font-size: 16px; margin-top: 12px;">
+                            Cancel
+                        </button>
+                    </div>
+                `;
+
+                modal.style.display = 'block';
+                modal.classList.add('open');
+            } catch (error) {
+                console.error('Error opening top up modal:', error);
+                if (typeof showToast !== 'undefined') {
+                    showToast('Failed to load top up options', 'error');
+                }
+            }
+        }
+
+        // Confirm top up and add tokens
+        async function confirmTopUp() {
+            try {
+                // Check if managers are available
+                if (typeof authManager === 'undefined' || typeof databaseManager === 'undefined') {
+                    console.error('Authentication or database managers not loaded');
+                    return;
+                }
+
+                const user = authManager.getCurrentUser();
+                if (!user) {
+                    alert('Please login to top up your wallet');
+                    return;
+                }
+
+                // Show loading state
+                const content = document.getElementById('topUpContent');
+                content.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">⏳</div>
+                        <h3 style="color: var(--cyan);">Processing...</h3>
+                        <p style="color: var(--light); opacity: 0.8;">Adding 100,000 tokens to your wallet</p>
+                    </div>
+                `;
+
+                // Add 100,000 tokens
+                const { data: transactionId, error } = await databaseManager.addTokens(
+                    user.id,
+                    100000,
+                    'Wallet top up',
+                    null
+                );
+
+                if (error) {
+                    throw error;
+                }
+
+                // Success - update balance display
+                await updateTokenBalance();
+
+                // Show success message
+                content.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+                        <h3 style="color: var(--cyan);">Success!</h3>
+                        <p style="color: var(--light); opacity: 0.8; margin-bottom: 24px;">100,000 tokens have been added to your wallet</p>
+                        <button class="btn btn-primary" onclick="closeTopUpModal(); updateTokenBalance();" style="width: 100%; padding: 16px; font-size: 16px;">
+                            Close
+                        </button>
+                    </div>
+                `;
+
+                // Show toast notification
+                if (typeof showToast !== 'undefined') {
+                    showToast('Wallet topped up successfully! 100,000 tokens added.', 'success');
+                }
+
+            } catch (error) {
+                console.error('Error topping up wallet:', error);
+                
+                const content = document.getElementById('topUpContent');
+                if (content) {
+                    content.innerHTML = `
+                        <div style="text-align: center;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+                            <h3 style="color: var(--pink);">Error</h3>
+                            <p style="color: var(--light); opacity: 0.8; margin-bottom: 24px;">Failed to top up wallet: ${error.message || 'Unknown error'}</p>
+                            <button class="btn btn-secondary" onclick="closeTopUpModal()" style="width: 100%; padding: 16px; font-size: 16px;">
+                                Close
+                            </button>
+                        </div>
+                    `;
+                }
+
+                if (typeof showToast !== 'undefined') {
+                    showToast('Failed to top up wallet. Please try again.', 'error');
+                }
+            }
+        }
+
+        // Close top up modal
+        function closeTopUpModal() {
+            const modal = document.getElementById('topUpModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('open');
+            }
+        }
+
         // Close cart modal when clicking outside
         document.addEventListener('click', function(event) {
             const cartModal = document.getElementById('cartModal');
@@ -2048,6 +2584,16 @@
             const orderHistoryModal = document.getElementById('orderHistoryModal');
             if (orderHistoryModal && event.target === orderHistoryModal) {
                 closeOrderHistoryModal();
+            }
+
+            const transactionHistoryModal = document.getElementById('transactionHistoryModal');
+            if (transactionHistoryModal && event.target === transactionHistoryModal) {
+                closeTransactionHistoryModal();
+            }
+
+            const walletBalanceModal = document.getElementById('walletBalanceModal');
+            if (walletBalanceModal && event.target === walletBalanceModal) {
+                closeWalletModal();
             }
         });
 
@@ -2195,6 +2741,37 @@
         }
         
         // Initialize cart on page load
+        // Update token balance display
+        async function updateTokenBalance() {
+            try {
+                // Check if managers are available
+                if (typeof authManager === 'undefined' || typeof databaseManager === 'undefined') {
+                    console.log('Managers not loaded yet, skipping token balance update');
+                    return;
+                }
+
+                const badge = document.getElementById('tokenBalance');
+                if (!badge) return;
+
+                const user = authManager.getCurrentUser();
+                if (!user) {
+                    badge.textContent = '0';
+                    return;
+                }
+
+                const { data: balance, error } = await databaseManager.getUserTokenBalance(user.id);
+                if (error) {
+                    console.error('Error fetching token balance:', error);
+                    badge.textContent = '0';
+                    return;
+                }
+
+                badge.textContent = formatPrice(balance);
+            } catch (error) {
+                console.error('Error updating token balance:', error);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', async function() {
             // Set up event delegation for cart buttons once
             const cartContent = document.getElementById('cartContent');
@@ -2203,6 +2780,7 @@
             }
             
             await loadCart();
+            await updateTokenBalance(); // Load token balance on page load
         });
 
         // Close modal when clicking outside

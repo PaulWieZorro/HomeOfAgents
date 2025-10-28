@@ -255,6 +255,20 @@ class CartAPI {
                 };
             });
 
+            // If paying with tokens, validate and deduct balance
+            if (paymentMethod === 'tokens') {
+                // Get user's current balance
+                const { data: balance, error: balanceError } = await databaseManager.getUserTokenBalance(this.userId);
+                
+                if (balanceError) {
+                    throw new Error('Failed to check token balance');
+                }
+                
+                if (balance < totalPrice) {
+                    throw new Error(`Insufficient token balance. You have ${balance.toFixed(2)} tokens but need ${totalPrice.toFixed(2)} tokens.`);
+                }
+            }
+
             // Create order
             const { data: order, error: orderError } = await supabase
                 .from('orders')
@@ -264,7 +278,7 @@ class CartAPI {
                     total_price_usd: totalPrice,
                     payment_method: paymentMethod,
                     order_status: 'pending',
-                    payment_status: 'pending'
+                    payment_status: paymentMethod === 'tokens' ? 'completed' : 'pending'
                 })
                 .select()
                 .single();
@@ -283,6 +297,23 @@ class CartAPI {
                 .select();
 
             if (itemsError) throw itemsError;
+
+            // If paying with tokens, deduct the amount
+            if (paymentMethod === 'tokens') {
+                const description = `Purchase: ${orderItems.length} agent(s) - Order ${order.order_number}`;
+                const { data: transactionId, error: tokenError } = await databaseManager.deductTokens(
+                    this.userId,
+                    totalPrice,
+                    order.id,
+                    description
+                );
+                
+                if (tokenError) {
+                    // Rollback: Delete the order if token deduction fails
+                    await supabase.from('orders').delete().eq('id', order.id);
+                    throw new Error('Failed to deduct tokens from your account');
+                }
+            }
 
             // Mark cart items as converted
             const cartItemIds = cartItems.map(item => item.id);

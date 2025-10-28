@@ -280,6 +280,95 @@ class DatabaseManager {
             throw error;
         }
     }
+
+    // ============================================
+    // WALLET/TOKEN OPERATIONS
+    // ============================================
+
+    // Get user's current token balance
+    async getUserTokenBalance(userId) {
+        try {
+            const { data, error } = await supabase
+                .from('custom_auth')
+                .select('token_balance')
+                .eq('id', userId)
+                .single();
+
+            if (error) {
+                throw error;
+            }
+
+            return { data: data.token_balance, error: null };
+        } catch (error) {
+            console.error('Error fetching token balance:', error);
+            return { data: 0, error };
+        }
+    }
+
+    // Deduct tokens for a purchase (creates transaction record)
+    async deductTokens(userId, amount, orderId, description = null) {
+        try {
+            const { data, error } = await supabase.rpc('adjust_user_tokens', {
+                p_user_id: userId,
+                p_amount: -amount, // Negative for deduction
+                p_transaction_type: 'purchase',
+                p_description: description || `Purchase: Order ${orderId}`,
+                p_related_order_id: orderId,
+                p_metadata: null
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            return { data, error: null };
+        } catch (error) {
+            console.error('Error deducting tokens:', error);
+            return { data: null, error };
+        }
+    }
+
+    // Get user's transaction history
+    async getTransactionHistory(userId, limit = 50) {
+        try {
+            const { data, error } = await supabase.rpc('get_user_transactions', {
+                p_user_id: userId,
+                p_limit: limit
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            return { data: data || [], error: null };
+        } catch (error) {
+            console.error('Error fetching transaction history:', error);
+            return { data: [], error };
+        }
+    }
+
+    // Add tokens (admin function)
+    async addTokens(userId, amount, description = 'Admin addition', metadata = null) {
+        try {
+            const { data, error } = await supabase.rpc('adjust_user_tokens', {
+                p_user_id: userId,
+                p_amount: amount, // Positive for addition
+                p_transaction_type: 'admin_add',
+                p_description: description,
+                p_related_order_id: null,
+                p_metadata: metadata
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            return { data, error: null };
+        } catch (error) {
+            console.error('Error adding tokens:', error);
+            return { data: null, error };
+        }
+    }
 }
 
 // Initialize managers

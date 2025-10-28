@@ -133,6 +133,18 @@ ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cart_items ENABLE ROW LEVEL SECURITY;
 
+-- Helper function to get current user ID from session
+CREATE OR REPLACE FUNCTION get_current_user_id()
+RETURNS UUID AS $$
+BEGIN
+  -- This gets the current user from the JWT claim set by your application
+  RETURN COALESCE(
+    NULLIF(current_setting('request.jwt.claims', true)::json->>'sub', '')::UUID,
+    NULLIF(current_setting('request.jwt.claims', true)::json->>'user_id', '')::UUID
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Drop existing policies if they exist
 DROP POLICY IF EXISTS "Users can view own orders" ON orders;
 DROP POLICY IF EXISTS "Users can insert own orders" ON orders;
@@ -149,15 +161,15 @@ DROP POLICY IF EXISTS "Users can delete own cart items" ON cart_items;
 -- Orders policies
 CREATE POLICY "Users can view own orders"
   ON orders FOR SELECT
-  USING (true);
+  USING (user_id = get_current_user_id());
 
 CREATE POLICY "Users can insert own orders"
   ON orders FOR INSERT
-  WITH CHECK (true);
+  WITH CHECK (user_id = get_current_user_id());
 
 CREATE POLICY "Users can update own orders"
   ON orders FOR UPDATE
-  USING (true);
+  USING (user_id = get_current_user_id());
 
 -- Order items policies (users can see items from their own orders)
 CREATE POLICY "Users can view own order items"
@@ -166,29 +178,36 @@ CREATE POLICY "Users can view own order items"
     EXISTS (
       SELECT 1 FROM orders 
       WHERE orders.id = order_items.order_id
+      AND orders.user_id = get_current_user_id()
     )
   );
 
 CREATE POLICY "Users can insert order items"
   ON order_items FOR INSERT
-  WITH CHECK (true);
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM orders 
+      WHERE orders.id = order_items.order_id
+      AND orders.user_id = get_current_user_id()
+    )
+  );
 
 -- Cart items policies
 CREATE POLICY "Users can view own cart"
   ON cart_items FOR SELECT
-  USING (true);
+  USING (user_id = get_current_user_id());
 
 CREATE POLICY "Users can insert own cart items"
   ON cart_items FOR INSERT
-  WITH CHECK (true);
+  WITH CHECK (user_id = get_current_user_id());
 
 CREATE POLICY "Users can update own cart"
   ON cart_items FOR UPDATE
-  USING (true);
+  USING (user_id = get_current_user_id());
 
 CREATE POLICY "Users can delete own cart items"
   ON cart_items FOR DELETE
-  USING (true);
+  USING (user_id = get_current_user_id());
 
 -- FUNCTION: Generate unique order number
 CREATE OR REPLACE FUNCTION generate_order_number()
