@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Agentryxx</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .checkout-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .checkout-header {
+            margin-bottom: 32px;
+        }
+
+        .checkout-header h1 {
+            color: var(--cyan);
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .checkout-header p {
+            color: var(--silver);
+            font-size: 16px;
+        }
+
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 32px;
+        }
+
+        @media (max-width: 968px) {
+            .checkout-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkout-section {
+            background: rgba(46, 46, 46, 0.3);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            color: var(--cyan);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--light);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(10, 17, 40, 0.8);
+            color: var(--light);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--cyan);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .payment-method {
+            background: rgba(10, 17, 40, 0.8);
+            border: 2px solid rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .payment-method:hover {
+            border-color: var(--cyan);
+            background: rgba(0, 229, 255, 0.05);
+        }
+
+        .payment-method.active {
+            border-color: var(--cyan);
+            background: rgba(0, 229, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+
+        .payment-method input[type="radio"] {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .payment-method-info {
+            flex: 1;
+        }
+
+        .payment-method-name {
+            color: var(--cyan);
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .payment-method-desc {
+            color: var(--silver);
+            font-size: 13px;
+        }
+
+        .token-balance-info {
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        .token-balance-label {
+            color: var(--silver);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .token-balance-amount {
+            color: var(--cyan);
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .token-balance-warning {
+            color: var(--pink);
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .order-summary {
+            background: rgba(46, 46, 46, 0.3);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 20px;
+        }
+
+        .order-item-summary {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .order-item-name {
+            color: var(--light);
+            font-size: 14px;
+        }
+
+        .order-item-price {
+            color: var(--cyan);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            margin-top: 16px;
+            border-top: 2px solid rgba(0, 229, 255, 0.3);
+        }
+
+        .order-total-label {
+            color: var(--light);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .order-total-amount {
+            color: var(--cyan);
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .checkout-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(90deg, var(--pink), var(--cyan));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+        }
+
+        .checkout-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 229, 255, 0.4);
+        }
+
+        .checkout-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .back-to-cart {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--cyan);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .back-to-cart:hover {
+            color: var(--pink);
+            gap: 12px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .error-message {
+            background: rgba(255, 20, 147, 0.1);
+            border: 1px solid rgba(255, 20, 147, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--pink);
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--silver);
+        }
+
+        .empty-cart-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .user-info-badge {
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .user-info-badge i {
+            color: var(--cyan);
+            font-size: 18px;
+        }
+
+        .user-info-badge-text {
+            color: var(--light);
+        }
+
+        .user-info-badge-text strong {
+            color: var(--cyan);
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">Agentry<span class="xx">xx</span></div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <a href="dashboard_company.html" class="btn btn-secondary">Dashboard</a>
+                <a href="marketplace.html" class="btn btn-secondary">Marketplace</a>
+            </div>
+        </nav>
+
+        <div class="checkout-container">
+            <div class="checkout-header">
+                <h1>Checkout</h1>
+                <p>Complete your purchase</p>
+            </div>
+
+            <div id="emptyCartMessage" class="empty-cart" style="display: none;">
+                <div class="empty-cart-icon">🛒</div>
+                <h3 style="color: var(--cyan); margin-bottom: 8px;" id="emptyCartTitle">Your cart is empty</h3>
+                <p id="emptyCartDesc">Add items to your cart to continue</p>
+                <div id="emptyCartActions">
+                    <a href="marketplace.html" class="btn btn-primary" style="margin-top: 24px;">
+                        Browse Marketplace
+                    </a>
+                </div>
+            </div>
+
+            <div id="checkoutContent" style="display: none;">
+                <a href="marketplace.html" class="back-to-cart">
+                    <i class="fas fa-arrow-left"></i> Back to Cart
+                </a>
+
+                <div class="checkout-grid">
+                    <!-- Left Column: Billing & Payment -->
+                    <div>
+                        <!-- User Info Badge -->
+                        <div id="userInfoBadge" class="user-info-badge" style="display: none;">
+                            <i class="fas fa-info-circle"></i>
+                            <div class="user-info-badge-text" id="userInfoBadgeText">
+                                <strong>Using your saved information</strong> - Pre-filled from your account
+                            </div>
+                        </div>
+
+                        <!-- Billing Information -->
+                        <div class="checkout-section">
+                            <h2 class="section-title">Billing Information</h2>
+                            <div class="form-group">
+                                <label class="form-label" for="billingName">Full Name *</label>
+                                <input type="text" id="billingName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="billingCompany">Company Name *</label>
+                                <input type="text" id="billingCompany" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="billingEmail">Email *</label>
+                                <input type="email" id="billingEmail" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="billingPhone">Phone</label>
+                                <input type="tel" id="billingPhone" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="billingAddress">Address *</label>
+                                <input type="text" id="billingAddress" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="billingCity">City *</label>
+                                <input type="text" id="billingCity" class="form-input" required>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div class="form-group">
+                                    <label class="form-label" for="billingState">State/Region *</label>
+                                    <input type="text" id="billingState" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="billingZip">ZIP/Postal Code *</label>
+                                    <input type="text" id="billingZip" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="billingCountry">Country *</label>
+                                <select id="billingCountry" class="form-input" required>
+                                    <option value="">Select Country</option>
+                                    <option value="US">United States</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="FR">France</option>
+                                    <option value="GB">United Kingdom</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="AU">Australia</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="checkout-section">
+                            <h2 class="section-title">Payment Method</h2>
+                            <div class="payment-methods">
+                                <label class="payment-method active" onclick="selectPaymentMethod('token')">
+                                    <input type="radio" name="paymentMethod" value="token" checked>
+                                    <div class="payment-method-info">
+                                        <div class="payment-method-name">
+                                            <i class="fas fa-coins"></i> Agentryxx Token
+                                        </div>
+                                        <div class="payment-method-desc">Pay with your internal wallet balance</div>
+                                    </div>
+                                </label>
+                                <label class="payment-method" onclick="selectPaymentMethod('stablecoin')">
+                                    <input type="radio" name="paymentMethod" value="stablecoin">
+                                    <div class="payment-method-info">
+                                        <div class="payment-method-name">
+                                            <i class="fas fa-dollar-sign"></i> Stable Coin
+                                        </div>
+                                        <div class="payment-method-desc">Pay with USDC, USDT or DAI</div>
+                                    </div>
+                                </label>
+                                <label class="payment-method" onclick="selectPaymentMethod('eur')">
+                                    <input type="radio" name="paymentMethod" value="eur">
+                                    <div class="payment-method-info">
+                                        <div class="payment-method-name">
+                                            <i class="fas fa-euro-sign"></i> EUR
+                                        </div>
+                                        <div class="payment-method-desc">Credit card or bank transfer</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Token Balance Display -->
+                            <div id="tokenBalanceInfo" class="token-balance-info">
+                                <div class="token-balance-label">Current Balance</div>
+                                <div id="tokenBalanceAmount" class="token-balance-amount">$0.00</div>
+                                <div id="tokenBalanceWarning" class="token-balance-warning" style="display: none;">
+                                    Insufficient balance to complete this purchase
+                                </div>
+                            </div>
+
+                            <!-- Stable Coin Wallet Address -->
+                            <div id="stablecoinWalletInfo" class="token-balance-info" style="display: none; margin-top: 12px;">
+                                <div class="token-balance-label">Wallet Address</div>
+                                <input type="text" id="walletAddress" class="form-input" placeholder="Enter your USDC, USDT or DAI wallet address" style="margin-top: 8px;">
+                                <div style="font-size: 12px; color: var(--silver); margin-top: 8px;">
+                                    <i class="fas fa-info-circle"></i> Supported networks: Ethereum, Polygon, Arbitrum
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="errorMessage" class="error-message" style="display: none;"></div>
+                    </div>
+
+                    <!-- Right Column: Order Summary -->
+                    <div>
+                        <div class="order-summary">
+                            <h2 class="section-title">Order Summary</h2>
+                            <div id="orderItems"></div>
+                            <div class="order-total">
+                                <span class="order-total-label">Total:</span>
+                                <span id="orderTotal" class="order-total-amount">$0.00</span>
+                            </div>
+                            <button class="checkout-button" onclick="processCheckout()" id="checkoutBtn">
+                                Complete Purchase
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/starfield.js"></script>
+    <script src="../assets/toaster.js"></script>
+    <script src="../assets/app.js"></script>
+    <script src="../assets/supabase-config.js"></script>
+    <script src="../assets/cart-api.js"></script>
+    
+    <script>
+        let cart = [];
+        let selectedPaymentMethod = 'token';
+        let userTokenBalance = 0;
+        let totalPrice = 0;
+
+        // Initialize page
+        async function initCheckout() {
+            try {
+                // Load cart items (without login requirement)
+                await loadCart();
+
+                // Load token balance and user profile if logged in
+                if (typeof authManager !== 'undefined' && typeof databaseManager !== 'undefined') {
+                    const user = authManager.getCurrentUser();
+                    if (user) {
+                        // Set balance to 1,500,000 tokens for testing
+                        userTokenBalance = 1500000;
+                        updateTokenBalanceDisplay();
+                        checkBalance();
+                        await loadUserBillingInfo(user.id, user.email);
+                    } else {
+                        // Pre-fill with German business information for demo
+                        prefillBillingWithGermanBusiness();
+                    }
+                } else {
+                    // Pre-fill with German business information for demo
+                    prefillBillingWithGermanBusiness();
+                }
+            } catch (error) {
+                console.error('Error initializing checkout:', error);
+                // Pre-fill with German business info for demo - always continue
+                prefillBillingWithGermanBusiness();
+            }
+        }
+
+        // Pre-fill billing information with German business data for demo
+        function prefillBillingWithGermanBusiness() {
+            document.getElementById('billingName').value = 'Dr. Klaus Müller';
+            document.getElementById('billingCompany').value = 'FinTech Solutions GmbH';
+            document.getElementById('billingEmail').value = 'billing@fintech-solutions.de';
+            document.getElementById('billingPhone').value = '+49 30 12345678';
+            document.getElementById('billingAddress').value = 'Friedrichstraße 45';
+            document.getElementById('billingCity').value = 'Berlin';
+            document.getElementById('billingState').value = 'Berlin';
+            document.getElementById('billingZip').value = '10117';
+            document.getElementById('billingCountry').value = 'DE';
+        }
+
+        // Load user billing information from database
+        async function loadUserBillingInfo(userId, email) {
+            try {
+                // First, try to get KYB data (for companies)
+                const { data: kybData, error: kybError } = await supabase
+                    .from('kyb_data')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .single();
+
+                if (!kybError && kybData) {
+                    // Pre-fill with KYB data
+                    document.getElementById('billingEmail').value = email;
+                    document.getElementById('billingName').value = kybData.director_name || '';
+                    document.getElementById('billingCompany').value = kybData.legal_company_name || '';
+                    document.getElementById('billingAddress').value = kybData.street_number || '';
+                    document.getElementById('billingCity').value = kybData.city || '';
+                    document.getElementById('billingZip').value = kybData.postcode || '';
+                    document.getElementById('billingCountry').value = kybData.country_of_registration || '';
+                    document.getElementById('billingState').value = kybData.country_of_registration || '';
+                    
+                    // Show user info badge
+                    const badge = document.getElementById('userInfoBadge');
+                    const badgeText = document.getElementById('userInfoBadgeText');
+                    if (badge && badgeText) {
+                        badge.style.display = 'flex';
+                        badgeText.innerHTML = '<strong>Company:</strong> ' + (kybData.legal_company_name || email);
+                    }
+                    return;
+                }
+
+                // If no KYB data, try KYC data (for developers)
+                const { data: kycData, error: kycError } = await supabase
+                    .from('kyc_data')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .single();
+
+                if (!kycError && kycData) {
+                    // Pre-fill with KYC data
+                    document.getElementById('billingEmail').value = email;
+                    document.getElementById('billingName').value = kycData.full_name || '';
+                    document.getElementById('billingCompany').value = ''; // KYC doesn't have company
+                    document.getElementById('billingAddress').value = kycData.address || '';
+                    document.getElementById('billingState').value = '';
+                    document.getElementById('billingZip').value = '';
+                    document.getElementById('billingCity').value = '';
+                    document.getElementById('billingCountry').value = '';
+                    
+                    // Show user info badge
+                    const badge = document.getElementById('userInfoBadge');
+                    const badgeText = document.getElementById('userInfoBadgeText');
+                    if (badge && badgeText) {
+                        badge.style.display = 'flex';
+                        badgeText.innerHTML = '<strong>Name:</strong> ' + (kycData.full_name || email);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user billing info:', error);
+                // Don't block checkout if loading fails
+            }
+        }
+
+        // Update token balance
+        async function updateTokenBalance() {
+            try {
+                if (typeof databaseManager !== 'undefined' && typeof authManager !== 'undefined') {
+                    const user = authManager.getCurrentUser();
+                    if (user) {
+                        const { data: balance } = await databaseManager.getUserTokenBalance(user.id);
+                        userTokenBalance = balance || 0;
+                        updateTokenBalanceDisplay();
+                        
+                        // Re-check balance if token payment is selected
+                        if (selectedPaymentMethod === 'token') {
+                            checkBalance();
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating token balance:', error);
+            }
+        }
+
+        // Load cart items
+        async function loadCart() {
+            try {
+                // Set balance to 1,500,000 tokens for all users (for testing)
+                userTokenBalance = 1500000;
+                updateTokenBalanceDisplay();
+                
+                // Try to load from database if user is logged in
+                if (typeof cartAPI !== 'undefined' && cartAPI.userId) {
+                    const cartItems = await cartAPI.getCartItems();
+                    if (cartItems.length > 0) {
+                        cart = cartItems.map(item => ({
+                            cartId: item.id,
+                            agentId: item.agent_id,
+                            name: item.agents.name,
+                            price: parseFloat(item.agents.price_yearly),
+                            currency: item.agents.price_currency,
+                            quantity: item.quantity
+                        }));
+
+                        calculateTotal();
+                        showCheckoutContent();
+                        renderOrderItems();
+                        return;
+                    }
+                }
+                
+                // Try to load from localStorage as fallback
+                const savedCart = localStorage.getItem('marketplace_cart');
+                if (savedCart) {
+                    cart = JSON.parse(savedCart);
+                    if (cart.length > 0) {
+                        calculateTotal();
+                        showCheckoutContent();
+                        renderOrderItems();
+                        return;
+                    }
+                }
+                
+                // No cart found
+                showEmptyCart();
+            } catch (error) {
+                console.error('Error loading cart:', error);
+                // Try localStorage fallback
+                try {
+                    const savedCart = localStorage.getItem('marketplace_cart');
+                    if (savedCart) {
+                        cart = JSON.parse(savedCart);
+                        if (cart.length > 0) {
+                            calculateTotal();
+                            showCheckoutContent();
+                            renderOrderItems();
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error loading from localStorage:', e);
+                }
+                showEmptyCart();
+            }
+        }
+
+        // Show empty cart message
+        function showEmptyCart() {
+            const emptyCartMessage = document.getElementById('emptyCartMessage');
+            const emptyCartTitle = document.getElementById('emptyCartTitle');
+            const emptyCartDesc = document.getElementById('emptyCartDesc');
+            const emptyCartActions = document.getElementById('emptyCartActions');
+            
+            emptyCartMessage.style.display = 'block';
+            document.getElementById('checkoutContent').style.display = 'none';
+            
+            // Always show the same message - no login required
+            emptyCartTitle.textContent = 'Your cart is empty';
+            emptyCartDesc.textContent = 'Add items to your cart to continue';
+            emptyCartActions.innerHTML = `
+                <a href="marketplace.html" class="btn btn-primary" style="margin-top: 24px;">
+                    <i class="fas fa-shopping-cart"></i> Browse Marketplace
+                </a>
+            `;
+        }
+
+        // Show checkout content
+        function showCheckoutContent() {
+            document.getElementById('emptyCartMessage').style.display = 'none';
+            document.getElementById('checkoutContent').style.display = 'block';
+        }
+
+        // Render order items
+        function renderOrderItems() {
+            const container = document.getElementById('orderItems');
+            
+            if (cart.length === 0) {
+                container.innerHTML = '<p style="color: var(--silver);">No items in cart</p>';
+                return;
+            }
+
+            const itemsHTML = cart.map(item => {
+                // Handle different cart data structures
+                const name = item.name;
+                const price = typeof item.priceNumeric !== 'undefined' ? item.priceNumeric : parseFloat(item.price);
+                const quantity = item.quantity || 1;
+                const total = price * quantity;
+                
+                return `
+                    <div class="order-item-summary">
+                        <div class="order-item-name">${name} ${quantity > 1 ? `(x${quantity})` : ''}</div>
+                        <div class="order-item-price">${formatPrice(total)}</div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = itemsHTML;
+        }
+
+        // Calculate total
+        function calculateTotal() {
+            totalPrice = cart.reduce((sum, item) => {
+                const price = typeof item.priceNumeric !== 'undefined' ? item.priceNumeric : parseFloat(item.price);
+                const quantity = item.quantity || 1;
+                return sum + (price * quantity);
+            }, 0);
+            
+            document.getElementById('orderTotal').textContent = formatPrice(totalPrice);
+            checkBalance();
+        }
+
+        // Format price
+        function formatPrice(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Select payment method
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            
+            // Update active state for all payment methods
+            const allMethods = document.querySelectorAll('.payment-method');
+            allMethods.forEach((el, index) => {
+                const input = el.querySelector('input[type="radio"]');
+                if (input.value === method) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+            
+            // Update radio buttons
+            const allInputs = document.querySelectorAll('input[name="paymentMethod"]');
+            allInputs.forEach(input => {
+                input.checked = input.value === method;
+            });
+
+            const balanceInfo = document.getElementById('tokenBalanceInfo');
+            const walletInfo = document.getElementById('stablecoinWalletInfo');
+            
+            // Show/hide relevant fields based on payment method
+            if (method === 'token') {
+                // Show token balance info, hide wallet address
+                balanceInfo.style.display = 'block';
+                if (walletInfo) walletInfo.style.display = 'none';
+                // Always enable checkout button - no balance check blocking
+                document.getElementById('checkoutBtn').disabled = false;
+            } else if (method === 'stablecoin') {
+                // Show wallet address, hide token balance
+                balanceInfo.style.display = 'none';
+                if (walletInfo) walletInfo.style.display = 'block';
+                document.getElementById('checkoutBtn').disabled = false;
+            } else if (method === 'eur') {
+                // Hide both
+                balanceInfo.style.display = 'none';
+                if (walletInfo) walletInfo.style.display = 'none';
+                document.getElementById('checkoutBtn').disabled = false;
+            }
+        }
+
+        // Update token balance display
+        function updateTokenBalanceDisplay() {
+            document.getElementById('tokenBalanceAmount').textContent = formatPrice(userTokenBalance);
+        }
+
+        // Check if user has sufficient balance (display only, never block)
+        async function checkBalance() {
+            if (selectedPaymentMethod !== 'token') {
+                return;
+            }
+
+            const balanceInfo = document.getElementById('tokenBalanceInfo');
+            const warning = document.getElementById('tokenBalanceWarning');
+
+            // Only show warning, never block checkout
+            if (userTokenBalance < totalPrice) {
+                warning.style.display = 'block';
+            } else {
+                warning.style.display = 'none';
+            }
+            
+            // Always keep checkout button enabled
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            if (checkoutBtn) {
+                checkoutBtn.disabled = false;
+            }
+        }
+
+        // Create order locally without database (for demo/testing)
+        async function createOrderLocally(paymentMethod) {
+            try {
+                // Generate a mock order
+                const orderId = 'local_' + Date.now();
+                const orderNumber = 'AGXX-' + new Date().toISOString().split('T')[0].replace(/-/g, '') + '-' + Math.floor(Math.random() * 10000).toString().padStart(5, '0');
+                
+                return {
+                    order: {
+                        id: orderId,
+                        order_number: orderNumber,
+                        total_price: totalPrice,
+                        payment_method: paymentMethod,
+                        order_status: 'completed',
+                        payment_status: paymentMethod === 'tokens' ? 'completed' : 'pending',
+                        created_at: new Date().toISOString()
+                    },
+                    items: cart.map(item => ({
+                        agent_id: item.agentId || item.agent_id,
+                        agent_name: item.name,
+                        price_per_year: item.price || item.priceNumeric,
+                        quantity: item.quantity || 1
+                    }))
+                };
+            } catch (error) {
+                console.error('Error creating local order:', error);
+                throw error;
+            }
+        }
+
+        // Process checkout
+        async function processCheckout() {
+            try {
+                const checkoutBtn = document.getElementById('checkoutBtn');
+                const errorMessage = document.getElementById('errorMessage');
+                
+                // Validate billing form
+                const billingData = {
+                    name: document.getElementById('billingName').value,
+                    company: document.getElementById('billingCompany').value,
+                    email: document.getElementById('billingEmail').value,
+                    phone: document.getElementById('billingPhone').value,
+                    address: document.getElementById('billingAddress').value,
+                    city: document.getElementById('billingCity').value,
+                    state: document.getElementById('billingState').value,
+                    zip: document.getElementById('billingZip').value,
+                    country: document.getElementById('billingCountry').value
+                };
+
+                if (!validateBillingForm(billingData)) {
+                    errorMessage.textContent = 'Please fill in all required fields';
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+
+                // Disable button and show loading
+                checkoutBtn.disabled = true;
+                checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+                // Map payment method
+                const paymentMethodMap = {
+                    'token': 'tokens',
+                    'stablecoin': 'stablecoin',
+                    'eur': 'eur'
+                };
+
+                const paymentMethod = paymentMethodMap[selectedPaymentMethod];
+
+                // Validate wallet address for stablecoin payments
+                if (selectedPaymentMethod === 'stablecoin') {
+                    const walletAddress = document.getElementById('walletAddress').value.trim();
+                    if (!walletAddress || walletAddress.length < 10) {
+                        errorMessage.textContent = 'Please enter a valid wallet address for stablecoin payment';
+                        errorMessage.style.display = 'block';
+                        checkoutBtn.disabled = false;
+                        checkoutBtn.innerHTML = 'Complete Purchase';
+                        return;
+                    }
+                }
+
+                // Create order directly - no login check
+                let result;
+                
+                // Try to use cartAPI if available, otherwise create order with local data
+                if (cartAPI && cartAPI.userId && typeof cartAPI.createOrder === 'function') {
+                    result = await cartAPI.createOrder(paymentMethod);
+                } else {
+                    // Create order locally if cartAPI is not available
+                    result = await createOrderLocally(paymentMethod);
+                }
+
+                // Store order info for confirmation page
+                const confirmationData = {
+                    orderId: result.order.id,
+                    orderNumber: result.order.order_number || 'AGXX-' + Date.now(),
+                    totalPrice: totalPrice,
+                    paymentMethod: paymentMethod,
+                    items: cart,
+                    timestamp: result.order.created_at || new Date().toISOString()
+                };
+                
+                console.log('Order created successfully:', confirmationData);
+                sessionStorage.setItem('orderConfirmation', JSON.stringify(confirmationData));
+
+                // Show success message and redirect
+                if (typeof showToast !== 'undefined') {
+                    showToast('Order placed successfully!', 'success');
+                }
+                
+                // Small delay before redirect to show success message
+                setTimeout(() => {
+                    window.location.href = 'order-confirmation.html';
+                }, 500);
+            } catch (error) {
+                console.error('Checkout error:', error);
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = error.message || 'Failed to process checkout. Please try again.';
+                errorMessage.style.display = 'block';
+                
+                const checkoutBtn = document.getElementById('checkoutBtn');
+                checkoutBtn.disabled = false;
+                checkoutBtn.innerHTML = 'Complete Purchase';
+                
+                if (typeof showToast !== 'undefined') {
+                    showToast(error.message, 'error');
+                }
+            }
+        }
+
+        // Validate billing form
+        function validateBillingForm(data) {
+            return data.name && 
+                   data.company && 
+                   data.email && 
+                   data.address && 
+                   data.city && 
+                   data.state && 
+                   data.zip && 
+                   data.country;
+        }
+
+        // Add event listeners for radio buttons
+        function addPaymentMethodListeners() {
+            const radioButtons = document.querySelectorAll('input[name="paymentMethod"]');
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.checked) {
+                        selectPaymentMethod(this.value);
+                    }
+                });
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initCheckout();
+            // Add payment method listeners after a short delay to ensure DOM is ready
+            setTimeout(addPaymentMethodListeners, 100);
+        });
+    </script>
+</body>
+</html>
+
