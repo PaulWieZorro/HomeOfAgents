@@ -411,6 +411,81 @@
             font-size: 18px;
             font-weight: 700;
         }
+        
+        /* Tab Navigation Styles */
+        .wallet-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid rgba(0, 229, 255, 0.2);
+        }
+        
+        .wallet-tab {
+            flex: 1;
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--silver);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .wallet-tab:hover {
+            color: var(--cyan);
+            background: rgba(0, 229, 255, 0.05);
+        }
+        
+        .wallet-tab.active {
+            color: var(--cyan);
+            border-bottom-color: var(--cyan);
+            background: rgba(0, 229, 255, 0.1);
+        }
+        
+        .wallet-tab-content {
+            display: none;
+        }
+        
+        .wallet-tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .sell-section {
+            margin-top: 32px;
+        }
+        
+        .payout-methods-section {
+            margin-bottom: 32px;
+        }
+        
+        .payout-methods-section h3 {
+            color: var(--cyan);
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        
+        .sell-info {
+            background: rgba(255, 20, 147, 0.1);
+            border: 1px solid rgba(255, 20, 147, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .sell-info p {
+            color: var(--light);
+            font-size: 14px;
+            margin: 0;
+            line-height: 1.6;
+        }
+        
+        .sell-info strong {
+            color: var(--cyan);
+        }
     </style>
 </head>
 <body>
@@ -544,8 +619,8 @@
 
         <section class="cta-section">
             <h2>Create Custom Agent</h2>
-            <p>Design and deploy your own AI agent tailored to your business needs.</p>
-            <a href="create-agent.html" class="btn btn-primary">Create Agent</a>
+            <p>Transform vague ideas into structured project briefs with our GPT voice agent. Guided conversations extract ISO 12207-aligned requirements, ready for agile execution.</p>
+            <a href="create-agent.html" class="btn btn-primary">Create a new Project Idea</a>
         </section>
     </div>
 
@@ -731,6 +806,11 @@
                     }).format(amount);
                 };
                 
+                // Initialize sell amount
+                if (!window.currentSellAmount) {
+                    window.currentSellAmount = Math.min(100000, currentBalance);
+                }
+                
                 // Render wallet content
                 content.innerHTML = `
                     <div class="wallet-balance-display">
@@ -739,71 +819,148 @@
                         <div class="wallet-balance-subtitle">Marketplace Tokens Available</div>
                     </div>
                     
-                    <div class="payment-methods-section">
-                        <h3>Top Up Payment Methods</h3>
-                        
-                        <div class="payment-method-card" onclick="selectPaymentMethod('eur')" id="payment-eur">
-                            <div class="payment-method-header">
-                                <i class="fas fa-euro-sign payment-method-icon"></i>
-                                <span class="payment-method-name">EUR (FIAT)</span>
-                            </div>
-                            <div class="payment-method-desc">
-                                Credit card or bank transfer. Instant conversion to marketplace tokens.
-                            </div>
-                        </div>
-                        
-                        <div class="payment-method-card" onclick="selectPaymentMethod('stablecoin')" id="payment-stablecoin">
-                            <div class="payment-method-header">
-                                <i class="fas fa-dollar-sign payment-method-icon"></i>
-                                <span class="payment-method-name">Stablecoins</span>
-                            </div>
-                            <div class="payment-method-desc">
-                                Pay with USDC, USDT, or DAI. Crypto payments converted to marketplace tokens.
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 32px;">
-                        <h3 style="color: var(--cyan); margin-bottom: 16px; font-size: 18px; text-align: center;">Select Amount</h3>
-                        
-                        <div class="quick-amounts">
-                            <div class="quick-amount-btn" onclick="setTopUpAmount(50000)" data-amount="50000">
-                                50,000
-                            </div>
-                            <div class="quick-amount-btn selected" onclick="setTopUpAmount(100000)" data-amount="100000">
-                                100,000
-                            </div>
-                            <div class="quick-amount-btn" onclick="setTopUpAmount(250000)" data-amount="250000">
-                                250,000
-                            </div>
-                            <div class="quick-amount-btn" onclick="setTopUpAmount(500000)" data-amount="500000">
-                                500,000
-                            </div>
-                            <div class="quick-amount-btn" onclick="setTopUpAmount(1000000)" data-amount="1000000">
-                                1,000,000
-                            </div>
-                            <div class="quick-amount-btn" onclick="setTopUpAmount(5000000)" data-amount="5000000">
-                                5,000,000
-                            </div>
-                        </div>
-                        
-                        <div class="amount-selector">
-                            <button class="amount-btn" onclick="adjustTopUpAmount(-10000)">−</button>
-                            <div class="amount-display" id="topUpAmountDisplay">${formatBalanceHelper(window.currentTopUpAmount)}</div>
-                            <button class="amount-btn" onclick="adjustTopUpAmount(10000)">+</button>
-                        </div>
-                    </div>
-                    
-                    <div class="confirm-section">
-                        <button class="btn btn-primary confirm-btn" onclick="confirmTopUp()">
-                            <i class="fas fa-check-circle"></i> Confirm Top Up
+                    <div class="wallet-tabs">
+                        <button class="wallet-tab active" onclick="switchWalletTab('topup')">
+                            <i class="fas fa-plus-circle"></i> Top Up
                         </button>
+                        <button class="wallet-tab" onclick="switchWalletTab('sell')">
+                            <i class="fas fa-arrow-down"></i> Sell Tokens
+                        </button>
+                    </div>
+                    
+                    <!-- Top Up Tab -->
+                    <div id="topup-tab" class="wallet-tab-content active">
+                        <div class="payment-methods-section">
+                            <h3>Top Up Payment Methods</h3>
+                            
+                            <div class="payment-method-card" onclick="selectPaymentMethod('eur')" id="payment-eur">
+                                <div class="payment-method-header">
+                                    <i class="fas fa-euro-sign payment-method-icon"></i>
+                                    <span class="payment-method-name">EUR (FIAT)</span>
+                                </div>
+                                <div class="payment-method-desc">
+                                    Credit card or bank transfer. Instant conversion to marketplace tokens.
+                                </div>
+                            </div>
+                            
+                            <div class="payment-method-card" onclick="selectPaymentMethod('stablecoin')" id="payment-stablecoin">
+                                <div class="payment-method-header">
+                                    <i class="fas fa-dollar-sign payment-method-icon"></i>
+                                    <span class="payment-method-name">Stablecoins</span>
+                                </div>
+                                <div class="payment-method-desc">
+                                    Pay with USDC, USDT, or DAI. Crypto payments converted to marketplace tokens.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 32px;">
+                            <h3 style="color: var(--cyan); margin-bottom: 16px; font-size: 18px; text-align: center;">Select Amount</h3>
+                            
+                            <div class="quick-amounts">
+                                <div class="quick-amount-btn" onclick="setTopUpAmount(50000)" data-amount="50000">
+                                    50,000
+                                </div>
+                                <div class="quick-amount-btn selected" onclick="setTopUpAmount(100000)" data-amount="100000">
+                                    100,000
+                                </div>
+                                <div class="quick-amount-btn" onclick="setTopUpAmount(250000)" data-amount="250000">
+                                    250,000
+                                </div>
+                                <div class="quick-amount-btn" onclick="setTopUpAmount(500000)" data-amount="500000">
+                                    500,000
+                                </div>
+                                <div class="quick-amount-btn" onclick="setTopUpAmount(1000000)" data-amount="1000000">
+                                    1,000,000
+                                </div>
+                                <div class="quick-amount-btn" onclick="setTopUpAmount(5000000)" data-amount="5000000">
+                                    5,000,000
+                                </div>
+                            </div>
+                            
+                            <div class="amount-selector">
+                                <button class="amount-btn" onclick="adjustTopUpAmount(-10000)">−</button>
+                                <div class="amount-display" id="topUpAmountDisplay">${formatBalanceHelper(window.currentTopUpAmount)}</div>
+                                <button class="amount-btn" onclick="adjustTopUpAmount(10000)">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="confirm-section">
+                            <button class="btn btn-primary confirm-btn" onclick="confirmTopUp()">
+                                <i class="fas fa-check-circle"></i> Confirm Top Up
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Sell Tokens Tab -->
+                    <div id="sell-tab" class="wallet-tab-content">
+                        <div class="sell-info">
+                            <p><strong>Convert tokens back to currency.</strong> Sell your marketplace tokens and receive funds via EUR (bank transfer) or stablecoins (USDC, USDT, DAI).</p>
+                        </div>
+                        
+                        <div class="payout-methods-section">
+                            <h3>Payout Methods</h3>
+                            
+                            <div class="payment-method-card" onclick="selectPayoutMethod('eur')" id="payout-eur">
+                                <div class="payment-method-header">
+                                    <i class="fas fa-euro-sign payment-method-icon"></i>
+                                    <span class="payment-method-name">EUR (Bank Transfer)</span>
+                                </div>
+                                <div class="payment-method-desc">
+                                    Receive funds via bank transfer. Processing time: 2-3 business days.
+                                </div>
+                            </div>
+                            
+                            <div class="payment-method-card" onclick="selectPayoutMethod('stablecoin')" id="payout-stablecoin">
+                                <div class="payment-method-header">
+                                    <i class="fas fa-dollar-sign payment-method-icon"></i>
+                                    <span class="payment-method-name">Stablecoins</span>
+                                </div>
+                                <div class="payment-method-desc">
+                                    Receive USDC, USDT, or DAI. Instant payout to your wallet.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 32px;">
+                            <h3 style="color: var(--cyan); margin-bottom: 16px; font-size: 18px; text-align: center;">Select Amount to Sell</h3>
+                            
+                            <div class="quick-amounts" id="sellQuickAmounts">
+                                <!-- Will be populated dynamically based on balance -->
+                            </div>
+                            
+                            <div class="amount-selector">
+                                <button class="amount-btn" onclick="adjustSellAmount(-10000)">−</button>
+                                <div class="amount-display" id="sellAmountDisplay">${formatBalanceHelper(Math.min(window.currentSellAmount, currentBalance))}</div>
+                                <button class="amount-btn" onclick="adjustSellAmount(10000)">+</button>
+                            </div>
+                            
+                            <div style="text-align: center; margin-top: 16px; color: var(--silver); font-size: 14px;">
+                                Max: ${formatBalanceHelper(currentBalance)}
+                            </div>
+                        </div>
+                        
+                        <div class="confirm-section">
+                            <button class="btn btn-primary confirm-btn" onclick="confirmSell()" style="background: linear-gradient(135deg, rgba(255, 20, 147, 0.8), rgba(255, 0, 127, 0.8));">
+                                <i class="fas fa-arrow-down"></i> Confirm Sell
+                            </button>
+                        </div>
                     </div>
                 `;
                 
                 // Set default payment method
                 selectedPaymentMethod = 'eur';
                 document.getElementById('payment-eur').classList.add('active');
+                
+                // Set default payout method
+                selectedPayoutMethod = 'eur';
+                const payoutEur = document.getElementById('payout-eur');
+                if (payoutEur) {
+                    payoutEur.classList.add('active');
+                }
+                
+                // Initialize sell quick amounts based on balance
+                initializeSellAmounts(currentBalance);
                 
             } catch (error) {
                 console.error('Error opening wallet modal:', error);
@@ -825,18 +982,65 @@
         
         // Track selected payment method
         let selectedPaymentMethod = 'eur';
+        let selectedPayoutMethod = 'eur';
         
         function selectPaymentMethod(method) {
             selectedPaymentMethod = method;
             
             // Update active state
-            document.querySelectorAll('.payment-method-card').forEach(card => {
+            document.querySelectorAll('#topup-tab .payment-method-card').forEach(card => {
                 card.classList.remove('active');
             });
             
             const selectedCard = document.getElementById(`payment-${method}`);
             if (selectedCard) {
                 selectedCard.classList.add('active');
+            }
+        }
+        
+        function selectPayoutMethod(method) {
+            selectedPayoutMethod = method;
+            
+            // Update active state
+            document.querySelectorAll('#sell-tab .payment-method-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            const selectedCard = document.getElementById(`payout-${method}`);
+            if (selectedCard) {
+                selectedCard.classList.add('active');
+            }
+        }
+        
+        function switchWalletTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.wallet-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Update tab content
+            document.querySelectorAll('.wallet-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Activate selected tab
+            if (tab === 'topup') {
+                document.querySelectorAll('.wallet-tab')[0].classList.add('active');
+                document.getElementById('topup-tab').classList.add('active');
+            } else if (tab === 'sell') {
+                document.querySelectorAll('.wallet-tab')[1].classList.add('active');
+                document.getElementById('sell-tab').classList.add('active');
+                
+                // Refresh sell amounts when switching to sell tab
+                const balanceEl = document.getElementById('walletBalanceAmount');
+                if (balanceEl) {
+                    const currentBalance = parseFloat(balanceEl.textContent.replace(/[^0-9.-]+/g, '')) || 0;
+                    if (window.currentSellAmount > currentBalance) {
+                        window.currentSellAmount = Math.max(10000, Math.floor(currentBalance / 10000) * 10000);
+                        updateSellDisplay();
+                    }
+                    initializeSellAmounts(currentBalance);
+                }
             }
         }
         
@@ -887,6 +1091,200 @@
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
             }).format(amount);
+        }
+        
+        // Sell amount management
+        function setSellAmount(amount) {
+            const balanceEl = document.getElementById('walletBalanceAmount');
+            const currentBalance = parseFloat(balanceEl.textContent.replace(/[^0-9.-]+/g, '')) || 0;
+            
+            // Don't allow selling more than balance
+            window.currentSellAmount = Math.min(amount, currentBalance);
+            updateSellDisplay();
+            
+            // Update selected state on quick amount buttons
+            document.querySelectorAll('#sellQuickAmounts .quick-amount-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                const btnText = btn.textContent.trim().replace(/,/g, '');
+                if (parseInt(btnText) === amount) {
+                    btn.classList.add('selected');
+                }
+            });
+        }
+        
+        function adjustSellAmount(change) {
+            const balanceEl = document.getElementById('walletBalanceAmount');
+            const currentBalance = parseFloat(balanceEl.textContent.replace(/[^0-9.-]+/g, '')) || 0;
+            
+            const newAmount = window.currentSellAmount + change;
+            window.currentSellAmount = Math.max(10000, Math.min(newAmount, currentBalance));
+            updateSellDisplay();
+            
+            // Clear selected state from quick buttons when manually adjusting
+            document.querySelectorAll('#sellQuickAmounts .quick-amount-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        }
+        
+        function updateSellDisplay() {
+            const display = document.getElementById('sellAmountDisplay');
+            if (display) {
+                display.textContent = formatTopUpAmount(window.currentSellAmount);
+            }
+        }
+        
+        function initializeSellAmounts(balance) {
+            const quickAmountsContainer = document.getElementById('sellQuickAmounts');
+            if (!quickAmountsContainer) return;
+            
+            // Generate quick amounts based on balance
+            let quickAmounts = [];
+            if (balance >= 5000000) {
+                quickAmounts = [50000, 100000, 250000, 500000, 1000000, 5000000];
+            } else if (balance >= 1000000) {
+                quickAmounts = [50000, 100000, 250000, 500000, 1000000, balance];
+            } else if (balance >= 500000) {
+                quickAmounts = [50000, 100000, 250000, 500000, balance, balance];
+            } else if (balance >= 250000) {
+                quickAmounts = [50000, 100000, 250000, balance, balance, balance];
+            } else if (balance >= 100000) {
+                quickAmounts = [50000, 100000, balance, balance, balance, balance];
+            } else if (balance >= 50000) {
+                quickAmounts = [50000, balance, balance, balance, balance, balance];
+            } else {
+                // For small balances, show percentage-based options
+                const amounts = [
+                    Math.floor(balance * 0.25),
+                    Math.floor(balance * 0.5),
+                    Math.floor(balance * 0.75),
+                    balance
+                ].filter(a => a >= 10000);
+                quickAmounts = [...amounts, ...Array(6 - amounts.length).fill(balance)].slice(0, 6);
+            }
+            
+            // Round amounts to nearest 10000
+            quickAmounts = quickAmounts.map(amt => Math.floor(amt / 10000) * 10000).filter(amt => amt >= 10000 && amt <= balance);
+            
+            // Remove duplicates and sort
+            quickAmounts = [...new Set(quickAmounts)].sort((a, b) => a - b);
+            
+            // Pad with balance if needed
+            while (quickAmounts.length < 6 && balance > 0) {
+                if (!quickAmounts.includes(balance)) {
+                    quickAmounts.push(Math.floor(balance / 10000) * 10000);
+                } else {
+                    break;
+                }
+            }
+            
+            quickAmounts = quickAmounts.slice(0, 6);
+            
+            quickAmountsContainer.innerHTML = quickAmounts.map(amount => {
+                const isSelected = amount === window.currentSellAmount ? 'selected' : '';
+                const formatted = new Intl.NumberFormat('en-US').format(amount);
+                return `
+                    <div class="quick-amount-btn ${isSelected}" onclick="setSellAmount(${amount})" data-amount="${amount}">
+                        ${formatted}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Confirm sell and deduct tokens
+        async function confirmSell() {
+            try {
+                const balanceEl = document.getElementById('walletBalanceAmount');
+                const currentBalance = parseFloat(balanceEl.textContent.replace(/[^0-9.-]+/g, '')) || 0;
+                const amount = window.currentSellAmount || 100000;
+                
+                // Validate amount
+                if (amount > currentBalance) {
+                    if (typeof showNotification === 'function') {
+                        showNotification('Cannot sell more than your balance.', 'error');
+                    } else {
+                        alert('Cannot sell more than your balance.');
+                    }
+                    return;
+                }
+                
+                if (amount < 10000) {
+                    if (typeof showNotification === 'function') {
+                        showNotification('Minimum sell amount is $10,000.', 'error');
+                    } else {
+                        alert('Minimum sell amount is $10,000.');
+                    }
+                    return;
+                }
+                
+                // Check if managers are available
+                if (typeof window.authManager === 'undefined' || typeof window.databaseManager === 'undefined') {
+                    if (typeof showNotification === 'function') {
+                        showNotification('System not ready. Please refresh the page.', 'error');
+                    } else {
+                        alert('System not ready. Please refresh the page.');
+                    }
+                    return;
+                }
+                
+                const user = window.authManager.getCurrentUser();
+                if (!user) {
+                    // If not logged in, just show success message and update display (mock)
+                    if (typeof showNotification === 'function') {
+                        showNotification(`${formatTopUpAmount(amount)} sold successfully!`, 'success');
+                    }
+                    
+                    // Update balance display (mock update for demo)
+                    const newBalance = Math.max(0, currentBalance - amount);
+                    balanceEl.textContent = formatTopUpAmount(newBalance);
+                    
+                    // Reset sell amount to new balance if needed
+                    window.currentSellAmount = Math.min(window.currentSellAmount, newBalance);
+                    initializeSellAmounts(newBalance);
+                    return;
+                }
+                
+                // User is logged in - deduct tokens from database
+                // Note: You may need to implement a removeTokens or deductTokens method in databaseManager
+                // For now, we'll simulate with a negative transaction
+                const { data: transactionId, error } = await window.databaseManager.addTokens(
+                    user.id,
+                    -amount, // Negative amount for selling
+                    `Sold tokens via ${selectedPayoutMethod.toUpperCase()}`,
+                    { 
+                        payoutMethod: selectedPayoutMethod,
+                        transactionType: 'sell'
+                    }
+                );
+                
+                if (error) {
+                    throw error;
+                }
+                
+                // Refresh balance display
+                const { data: newBalance } = await window.databaseManager.getUserTokenBalance(user.id);
+                if (balanceEl) {
+                    balanceEl.textContent = formatTopUpAmount(newBalance || 0);
+                }
+                
+                // Reset sell amount
+                window.currentSellAmount = Math.min(window.currentSellAmount, newBalance || 0);
+                initializeSellAmounts(newBalance || 0);
+                
+                // Show success
+                if (typeof showNotification === 'function') {
+                    showNotification(`${formatTopUpAmount(amount)} sold successfully! Funds will be processed via ${selectedPayoutMethod.toUpperCase()}.`, 'success');
+                } else {
+                    alert(`${formatTopUpAmount(amount)} sold successfully!`);
+                }
+                
+            } catch (error) {
+                console.error('Error confirming sell:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Failed to sell tokens. Please try again.', 'error');
+                } else {
+                    alert('Failed to sell tokens. Please try again.');
+                }
+            }
         }
         
         // Confirm top-up and add tokens
