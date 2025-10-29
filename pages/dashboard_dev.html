@@ -171,6 +171,49 @@
             border-left: 4px solid #00FF88;
         }
         
+        .message-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        
+        .message-action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .message-action-btn-accept {
+            background: linear-gradient(90deg, var(--pink), var(--cyan));
+            color: var(--dark);
+        }
+        
+        .message-action-btn-accept:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 229, 255, 0.4);
+        }
+        
+        .message-action-btn-decline {
+            background: #4a4a4a;
+            color: var(--light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .message-action-btn-decline:hover {
+            background: #5a5a5a;
+            transform: translateY(-2px);
+        }
+        
+        .message-action-btn:active {
+            transform: translateY(0);
+        }
+        
         .modal {
             display: none;
             position: fixed;
@@ -222,9 +265,46 @@
             color: var(--cyan);
         }
         
+        .modal-content {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        /* Custom scrollbar for modal */
+        .modal-content::-webkit-scrollbar,
+        #modalContent::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .modal-content::-webkit-scrollbar-track,
+        #modalContent::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        
+        .modal-content::-webkit-scrollbar-thumb,
+        #modalContent::-webkit-scrollbar-thumb {
+            background: rgba(0, 229, 255, 0.5);
+            border-radius: 4px;
+        }
+        
+        .modal-content::-webkit-scrollbar-thumb:hover,
+        #modalContent::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 229, 255, 0.7);
+        }
+        
         .modal-body {
             color: var(--light);
             line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #modalContent {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 60vh;
+            padding-right: 8px;
         }
         
         .modal-sender {
@@ -237,6 +317,88 @@
             color: var(--silver);
             font-size: 14px;
             margin-bottom: 16px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .modal-btn-accept {
+            background: linear-gradient(90deg, var(--pink), var(--cyan));
+            color: var(--dark);
+        }
+        
+        .modal-btn-accept:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 229, 255, 0.4);
+        }
+        
+        .modal-btn-decline {
+            background: transparent;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            color: var(--light);
+        }
+        
+        .modal-btn-decline:hover {
+            background: rgba(0, 229, 255, 0.1);
+            border-color: var(--cyan);
+        }
+        
+        .requirements-section {
+            background: rgba(0, 229, 255, 0.05);
+            border-left: 4px solid var(--cyan);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 4px;
+        }
+        
+        .requirements-section h4 {
+            color: var(--cyan);
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .requirements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .requirement-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        
+        .requirement-item strong {
+            color: var(--cyan);
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .requirement-item p {
+            color: var(--silver);
+            font-size: 13px;
+            margin: 0;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -292,6 +454,10 @@
                     <div class="message-time">4 hours ago</div>
                 </div>
                 <div class="message-preview">Based on your risk analysis skills, we found a perfect match...</div>
+                <div class="message-actions" onclick="event.stopPropagation();">
+                    <button class="message-action-btn message-action-btn-decline" onclick="handleQuickDecline(2)">Decline Opportunity</button>
+                    <button class="message-action-btn message-action-btn-accept" onclick="handleQuickAccept(2)">Accept Opportunity</button>
+                </div>
             </div>
             
             <div class="message opportunity unread" onclick="openMessage(3)">
@@ -303,6 +469,10 @@
                     <div class="message-time">1 day ago</div>
                 </div>
                 <div class="message-preview">A major insurance company is looking for an AI agent...</div>
+                <div class="message-actions" onclick="event.stopPropagation();">
+                    <button class="message-action-btn message-action-btn-decline" onclick="handleQuickDecline(3)">Decline Opportunity</button>
+                    <button class="message-action-btn message-action-btn-accept" onclick="handleQuickAccept(3)">Accept Opportunity</button>
+                </div>
             </div>
             
             <div class="message client" onclick="openMessage(4)">
@@ -417,6 +587,10 @@
                 <div class="modal-sender" id="modalSender"></div>
                 <div class="modal-time" id="modalTime"></div>
                 <div id="modalContent"></div>
+                <div class="modal-actions" id="modalActions" style="display: none;">
+                    <button class="modal-btn modal-btn-decline" onclick="handleDeclineOffer()">Decline</button>
+                    <button class="modal-btn modal-btn-accept" onclick="handleAcceptOffer()">Accept</button>
+                </div>
             </div>
         </div>
     </div>
@@ -462,35 +636,78 @@
                 sender: "Opportunity Bot",
                 time: "4 hours ago",
                 subject: "New Project Match: Banking Fraud Detection Agent",
+                isOpportunity: true,
                 content: `
                     <h3>Banking Fraud Detection Agent Project</h3>
-                    <p><strong>Client:</strong> MetroBank Financial Services</p>
-                    <p><strong>Project Type:</strong> Real-time Fraud Detection & Risk Management</p>
-                    <p><strong>Estimated Duration:</strong> 4-6 months</p>
-                    <p><strong>Budget Range:</strong> $15,000 - $22,000</p>
                     
-                    <p><strong>Project Description:</strong></p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 20px 0;">
+                        <div>
+                            <p><strong style="color: var(--cyan);">Client:</strong> MetroBank Financial Services</p>
+                            <p><strong style="color: var(--cyan);">Project Type:</strong> Real-time Fraud Detection & Risk Management</p>
+                        </div>
+                        <div>
+                            <p><strong style="color: var(--cyan);">Estimated Duration:</strong> 4-6 months</p>
+                            <p><strong style="color: var(--cyan);">Budget Range:</strong> $15,000 - $22,000</p>
+                        </div>
+                    </div>
+                    
+                    <p><strong>Project Overview:</strong></p>
                     <p>MetroBank is seeking an AI agent to enhance their existing fraud detection system with real-time transaction monitoring, pattern recognition, and automated risk scoring. Based on your proven risk analysis skills and successful Banking Fraud Detection agent, this project is a perfect match.</p>
                     
-                    <p><strong>Required Skills:</strong></p>
-                    <ul>
-                        <li>Real-time transaction monitoring</li>
-                        <li>Machine learning for fraud detection</li>
-                        <li>Banking API integration</li>
-                        <li>Regulatory compliance (PCI DSS, SOX)</li>
-                        <li>Risk scoring algorithms</li>
-                    </ul>
+                    <div class="requirements-section">
+                        <h4>AI Agent Requirements</h4>
+                        <div class="requirements-grid">
+                            <div class="requirement-item">
+                                <strong>Core Functionality</strong>
+                                <p>Real-time transaction monitoring with sub-second latency, pattern recognition for fraud detection, and automated risk scoring algorithms</p>
+                            </div>
+                            <div class="requirement-item">
+                                <strong>Technical Capabilities</strong>
+                                <p>Machine learning models for anomaly detection, integration with banking APIs, and real-time alerting system</p>
+                            </div>
+                            <div class="requirement-item">
+                                <strong>Data Processing</strong>
+                                <p>Handle high-volume transaction streams (10,000+ transactions/second), implement batch processing for historical analysis</p>
+                            </div>
+                            <div class="requirement-item">
+                                <strong>User Interface</strong>
+                                <p>Dashboard for fraud analysts, real-time notification system, and detailed reporting interface</p>
+                            </div>
+                            <div class="requirement-item">
+                                <strong>Integration Points</strong>
+                                <p>Banking core systems, payment gateways, customer databases, and external fraud databases</p>
+                            </div>
+                            <div class="requirement-item">
+                                <strong>Security Requirements</strong>
+                                <p>End-to-end encryption, secure API authentication, audit logging, and role-based access control</p>
+                            </div>
+                        </div>
+                    </div>
                     
-                    <p><strong>Compliance Requirements:</strong></p>
-                    <ul>
-                        <li>PCI DSS Level 1 compliance</li>
-                        <li>Sarbanes-Oxley (SOX) compliance</li>
-                        <li>Bank Secrecy Act (BSA) adherence</li>
-                        <li>Anti-Money Laundering (AML) protocols</li>
-                    </ul>
+                    <div class="requirements-section">
+                        <h4>Compliance & Regulatory Requirements</h4>
+                        <ul>
+                            <li>PCI DSS Level 1 compliance for payment card data handling</li>
+                            <li>Sarbanes-Oxley (SOX) compliance for financial reporting</li>
+                            <li>Bank Secrecy Act (BSA) adherence for transaction monitoring</li>
+                            <li>Anti-Money Laundering (AML) protocols and reporting</li>
+                            <li>GDPR compliance for EU customer data protection</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="requirements-section">
+                        <h4>Success Metrics & KPIs</h4>
+                        <ul>
+                            <li>Fraud detection accuracy: Minimum 95% true positive rate</li>
+                            <li>False positive rate: Less than 2%</li>
+                            <li>Response time: Real-time detection within 500ms</li>
+                            <li>System uptime: 99.9% availability SLA</li>
+                            <li>Processing capacity: 10,000+ transactions per second</li>
+                        </ul>
+                    </div>
                     
                     <p><strong>Next Steps:</strong></p>
-                    <p>If interested, reply to this message and we'll schedule an introductory call with MetroBank's CTO. The project timeline is flexible and can accommodate your current workload.</p>
+                    <p>Upon acceptance, we'll schedule an introductory call with MetroBank's CTO within 48 hours. The project timeline is flexible and can accommodate your current workload. Contract and project kickoff materials will be provided immediately after acceptance.</p>
                     
                     <p><em>This opportunity was matched based on your financial services agent portfolio and compliance expertise.</em></p>
                 `
@@ -499,40 +716,93 @@
                 sender: "Opportunity Bot",
                 time: "1 day ago",
                 subject: "Project Opportunity: Insurance Claims Processing Agent",
+                isOpportunity: true,
                 content: `
                     <h3>Insurance Claims Processing Agent</h3>
-                    <p><strong>Client:</strong> Global Insurance Group</p>
-                    <p><strong>Project Type:</strong> Automated Claims Processing & Settlement</p>
-                    <p><strong>Estimated Duration:</strong> 6-8 months</p>
-                    <p><strong>Budget Range:</strong> $18,000 - $25,000</p>
                     
-                    <p><strong>Project Description:</strong></p>
+                    <p style="font-size: 16px; color: var(--light); margin-bottom: 24px; padding: 16px; background: rgba(0, 229, 255, 0.05); border-left: 4px solid var(--cyan); border-radius: 4px;"><strong>This is a premium opportunity with excellent growth potential in the insurance technology sector. We can provide compliance training and certification support if needed.</strong></p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 20px 0;">
+                        <div>
+                            <p><strong style="color: var(--cyan);">Client:</strong> Global Insurance Group</p>
+                            <p><strong style="color: var(--cyan);">Project Type:</strong> Automated Claims Processing & Settlement</p>
+                        </div>
+                        <div>
+                            <p><strong style="color: var(--cyan);">Estimated Duration:</strong> 6-8 months</p>
+                            <p><strong style="color: var(--cyan);">Budget Range:</strong> $18,000 - $25,000</p>
+                        </div>
+                    </div>
+                    
+                    <p><strong>Project Overview:</strong></p>
                     <p>Global Insurance Group is seeking an AI agent to automate their claims processing workflow, including document verification, damage assessment, policy validation, and settlement calculations. This is a high-value, long-term project that could establish you in the insurance AI sector.</p>
                     
-                    <p><strong>Key Requirements:</strong></p>
-                    <ul>
-                        <li>Document processing and OCR integration</li>
-                        <li>Policy validation and coverage analysis</li>
-                        <li>Damage assessment algorithms</li>
-                        <li>Settlement calculation engines</li>
-                        <li>Regulatory compliance (NAIC standards)</li>
-                    </ul>
+                    <div class="requirements-section">
+                        <h4>AI Agent Requirements</h4>
+                        <div class="requirements-grid">
+                            <div class="requirement-item">
+                                <strong>Core Functionality</strong>
+                                <p>Automated claims intake, document processing with OCR, policy validation, coverage analysis, damage assessment, and settlement calculation</p>
+                            </div>
+                            <div class="requirement-item">
+                                <strong>Document Processing</strong>
+                                <p>OCR integration for claim forms, photos, repair estimates, medical records, and policy documents with 98%+ accuracy</p>
+                            </div>
+                            <div class="requirement-item">
+                                <strong>Decision Engine</strong>
+                                <p>Automated approval for standard claims, escalation logic for complex cases, and fraud detection algorithms</p>
+                            </div>
+                            <div class="requirement-item">
+                                <strong>Multi-Line Support</strong>
+                                <p>Handle auto, home, commercial, health, and life insurance claims with line-specific processing rules</p>
+                            </div>
+                            <div class="requirement-item">
+                                <strong>Integration Requirements</strong>
+                                <p>Policy management systems, claims databases, payment processing, customer portals, and third-party damage assessors</p>
+                            </div>
+                            <div class="requirement-item">
+                                <strong>Reporting & Analytics</strong>
+                                <p>Real-time dashboards, claim status tracking, processing time metrics, and compliance reporting</p>
+                            </div>
+                        </div>
+                    </div>
                     
-                    <p><strong>Compliance Notes:</strong></p>
-                    <p>This project requires adherence to National Association of Insurance Commissioners (NAIC) standards and state-specific insurance regulations. We can provide compliance training and certification support if needed.</p>
+                    <div class="requirements-section">
+                        <h4>Compliance & Regulatory Requirements</h4>
+                        <ul>
+                            <li>National Association of Insurance Commissioners (NAIC) standards compliance</li>
+                            <li>State-specific insurance regulations for all 50 states</li>
+                            <li>HIPAA compliance for health insurance claims</li>
+                            <li>Fair Claims Practices Act adherence</li>
+                            <li>Data privacy regulations (GDPR, CCPA)</li>
+                            <li>Audit trail requirements for all claim decisions</li>
+                        </ul>
+                    </div>
                     
-                    <p><strong>Technical Requirements:</strong></p>
-                    <ul>
-                        <li>Integration with existing policy management systems</li>
-                        <li>Real-time processing capabilities</li>
-                        <li>Audit trail and reporting features</li>
-                        <li>Multi-line insurance support (auto, home, commercial)</li>
-                    </ul>
+                    <div class="requirements-section">
+                        <h4>Technical Specifications</h4>
+                        <ul>
+                            <li>Processing capacity: 5,000+ claims per day</li>
+                            <li>Response time: Initial claim processing within 30 seconds</li>
+                            <li>API integration with RESTful architecture</li>
+                            <li>Cloud-native deployment (AWS/Azure)</li>
+                            <li>Scalable microservices architecture</li>
+                            <li>99.5% system uptime SLA</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="requirements-section">
+                        <h4>Success Metrics & KPIs</h4>
+                        <ul>
+                            <li>Claims processing automation rate: 80%+ without human intervention</li>
+                            <li>Processing time reduction: 70% faster than manual process</li>
+                            <li>Accuracy rate: 95%+ correct coverage determination</li>
+                            <li>Fraud detection rate: Identify 90%+ fraudulent claims</li>
+                            <li>Customer satisfaction: 90%+ satisfaction with claim experience</li>
+                        </ul>
+                    </div>
                     
                     <p><strong>Timeline:</strong></p>
-                    <p>Project starts in 3 weeks. Initial consultation is scheduled for next Friday at 10 AM.</p>
-                    
-                    <p><em>This is a premium opportunity with excellent growth potential in the insurance technology sector.</em></p>
+                    <p>Project starts in 3 weeks. Initial consultation is scheduled for next Friday at 10 AM. Upon acceptance, detailed project specifications and milestone schedules will be provided within 48 hours.</p>
                 `
             },
             4: {
@@ -642,13 +912,25 @@
         };
         
         // Modal functions
+        let currentMessageId = null;
+        
         function openMessage(messageId) {
             const message = messages[messageId];
             if (message) {
+                currentMessageId = messageId;
                 document.getElementById('modalTitle').textContent = message.subject;
                 document.getElementById('modalSender').textContent = message.sender;
                 document.getElementById('modalTime').textContent = message.time;
                 document.getElementById('modalContent').innerHTML = message.content;
+                
+                // Show/hide action buttons for opportunity messages
+                const modalActions = document.getElementById('modalActions');
+                if (message.isOpportunity) {
+                    modalActions.style.display = 'flex';
+                } else {
+                    modalActions.style.display = 'none';
+                }
+                
                 document.getElementById('messageModal').style.display = 'block';
                 
                 // Mark message as read
@@ -661,6 +943,113 @@
         
         function closeMessage() {
             document.getElementById('messageModal').style.display = 'none';
+            currentMessageId = null;
+        }
+        
+        function handleAcceptOffer() {
+            if (currentMessageId) {
+                const message = messages[currentMessageId];
+                if (confirm(`Accept this opportunity: "${message.subject}"?`)) {
+                    alert(`Thank you for accepting the opportunity! The client will be notified and we'll schedule an introductory call within 48 hours. Redirecting to project setup...`);
+                    closeMessage();
+                    
+                    // Redirect to project setup page
+                    setTimeout(() => {
+                        window.location.href = 'project-setup.html';
+                    }, 500);
+                    
+                    // You can add additional logic here to handle the acceptance
+                    // For example, sending data to a server, updating UI, etc.
+                    console.log('Offer accepted for message:', currentMessageId);
+                }
+            }
+        }
+        
+        function handleDeclineOffer() {
+            if (currentMessageId) {
+                const message = messages[currentMessageId];
+                if (confirm(`Are you sure you want to decline the offer: "${message.subject}"?`)) {
+                    alert('Offer declined. The opportunity bot has been notified. Thank you for your response.');
+                    closeMessage();
+                    
+                    // You can add additional logic here to handle the decline
+                    // For example, sending data to a server, updating UI, etc.
+                    console.log('Offer declined for message:', currentMessageId);
+                }
+            }
+        }
+        
+        function handleQuickAccept(messageId) {
+            const message = messages[messageId];
+            if (message && message.isOpportunity) {
+                if (confirm(`Accept this opportunity: "${message.subject}"?`)) {
+                    alert(`Thank you for accepting the opportunity! The client will be notified and we'll schedule an introductory call within 48 hours. Redirecting to project setup...`);
+                    
+                    // Mark message as read and potentially hide/update it
+                    const messageElement = document.querySelector(`[onclick*="openMessage(${messageId})"]`);
+                    if (messageElement) {
+                        messageElement.classList.remove('unread');
+                        messageElement.style.opacity = '0.7';
+                        // Optionally remove or hide the button after acceptance
+                        const acceptBtn = messageElement.querySelector('.message-action-btn-accept');
+                        const declineBtn = messageElement.querySelector('.message-action-btn-decline');
+                        if (acceptBtn) {
+                            acceptBtn.textContent = 'Accepted';
+                            acceptBtn.disabled = true;
+                            acceptBtn.style.opacity = '0.6';
+                            acceptBtn.style.cursor = 'not-allowed';
+                        }
+                        if (declineBtn) {
+                            declineBtn.disabled = true;
+                            declineBtn.style.opacity = '0.6';
+                            declineBtn.style.cursor = 'not-allowed';
+                        }
+                    }
+                    
+                    // Redirect to project setup page
+                    setTimeout(() => {
+                        window.location.href = 'project-setup.html';
+                    }, 500);
+                    
+                    // You can add additional logic here to handle the acceptance
+                    // For example, sending data to a server, updating UI, etc.
+                    console.log('Opportunity accepted from inbox for message:', messageId);
+                }
+            }
+        }
+        
+        function handleQuickDecline(messageId) {
+            const message = messages[messageId];
+            if (message && message.isOpportunity) {
+                if (confirm(`Are you sure you want to decline this opportunity: "${message.subject}"?`)) {
+                    alert('Offer declined. The opportunity bot has been notified. Thank you for your response.');
+                    
+                    // Mark message as read and update buttons
+                    const messageElement = document.querySelector(`[onclick*="openMessage(${messageId})"]`);
+                    if (messageElement) {
+                        messageElement.classList.remove('unread');
+                        messageElement.style.opacity = '0.7';
+                        // Update buttons after decline
+                        const acceptBtn = messageElement.querySelector('.message-action-btn-accept');
+                        const declineBtn = messageElement.querySelector('.message-action-btn-decline');
+                        if (declineBtn) {
+                            declineBtn.textContent = 'Declined';
+                            declineBtn.disabled = true;
+                            declineBtn.style.opacity = '0.6';
+                            declineBtn.style.cursor = 'not-allowed';
+                        }
+                        if (acceptBtn) {
+                            acceptBtn.disabled = true;
+                            acceptBtn.style.opacity = '0.6';
+                            acceptBtn.style.cursor = 'not-allowed';
+                        }
+                    }
+                    
+                    // You can add additional logic here to handle the decline
+                    // For example, sending data to a server, updating UI, etc.
+                    console.log('Opportunity declined from inbox for message:', messageId);
+                }
+            }
         }
         
         // Close modal when clicking outside

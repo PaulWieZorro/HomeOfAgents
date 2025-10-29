@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing and Deployment - Agentryxx</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .billing-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-title {
+            color: var(--cyan);
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .section-card {
+            background: rgba(46, 46, 46, 0.3);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            color: var(--cyan);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Compressed Billing Info */
+        .billing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .billing-item {
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            background: rgba(10, 17, 40, 0.6);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 8px;
+        }
+
+        .billing-label {
+            color: var(--silver);
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .billing-value {
+            color: var(--cyan);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Order Summary */
+        .order-summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .order-summary-table th {
+            color: var(--cyan);
+            font-size: 12px;
+            font-weight: 600;
+            text-align: left;
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .order-summary-table td {
+            color: var(--silver);
+            font-size: 13px;
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .order-summary-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .order-summary-table .amount {
+            color: var(--cyan);
+            font-weight: 600;
+            text-align: right;
+        }
+
+        /* Token Balance Section */
+        .token-balance-card {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(255, 20, 147, 0.1));
+            border: 2px solid rgba(0, 229, 255, 0.4);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .token-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .token-label {
+            color: var(--light);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .token-amount {
+            color: var(--cyan);
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        /* Pay-as-you-go Emphasis */
+        .payg-section {
+            background: rgba(255, 20, 147, 0.1);
+            border: 2px solid rgba(255, 20, 147, 0.4);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .payg-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--pink), var(--cyan), var(--pink));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        .payg-title {
+            color: var(--pink);
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .payg-highlight {
+            color: var(--light);
+            font-size: 18px;
+            font-weight: 700;
+            margin: 16px 0;
+            line-height: 1.6;
+        }
+
+        .payg-details {
+            color: var(--silver);
+            font-size: 14px;
+            line-height: 1.8;
+            margin-top: 12px;
+        }
+
+        .payg-details strong {
+            color: var(--cyan);
+        }
+
+        /* Smart Contract Info */
+        .smart-contract-card {
+            background: rgba(0, 255, 136, 0.05);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .contract-title {
+            color: #00FF88;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contract-text {
+            color: var(--silver);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .contract-text strong {
+            color: #00FF88;
+        }
+
+        /* API Key Section */
+        .api-key-section {
+            background: rgba(46, 46, 46, 0.5);
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .api-key-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .api-key-label {
+            color: #FFD700;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .api-key-container {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .api-key-value {
+            color: var(--light);
+            font-size: 14px;
+            letter-spacing: 2px;
+            font-weight: 600;
+            user-select: all;
+        }
+
+        .api-key-masked {
+            color: var(--silver);
+        }
+
+        .copy-btn {
+            padding: 8px 16px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid #FFD700;
+            border-radius: 6px;
+            color: #FFD700;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .copy-btn.copied {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: #00FF88;
+            color: #00FF88;
+        }
+
+        .secret-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(255, 20, 147, 0.2);
+            border: 1px solid var(--pink);
+            border-radius: 12px;
+            color: var(--pink);
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+
+        /* Email Notification */
+        .email-notification {
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .email-icon {
+            font-size: 24px;
+            color: var(--cyan);
+        }
+
+        .email-text {
+            color: var(--silver);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .email-text strong {
+            color: var(--cyan);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .action-btn-primary {
+            background: linear-gradient(90deg, var(--pink), var(--cyan));
+            color: var(--dark);
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.3);
+        }
+
+        .action-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 50px rgba(255, 0, 127, 0.6);
+        }
+
+        .action-btn-secondary {
+            background: transparent;
+            border: 2px solid var(--cyan);
+            color: var(--cyan);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+        }
+
+        .action-btn-secondary:hover {
+            background: rgba(0, 229, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .billing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .token-display {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">Agentry<span class="xx">xx</span></div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <a href="dashboard_company.html" style="padding: 8px 16px; border-radius: 8px; background: rgba(46, 46, 46, 0.3); border: 1px solid rgba(0, 229, 255, 0.3); color: var(--cyan); text-decoration: none; transition: all 0.3s ease;">Dashboard</a>
+                <a href="marketplace.html" style="padding: 8px 16px; border-radius: 8px; background: rgba(46, 46, 46, 0.3); border: 1px solid rgba(0, 229, 255, 0.3); color: var(--cyan); text-decoration: none; transition: all 0.3s ease;">Marketplace</a>
+            </div>
+        </nav>
+
+        <div class="billing-container">
+            <h1 class="page-title">
+                <i class="fas fa-receipt"></i> Billing and Deployment
+            </h1>
+
+            <!-- Compressed Billing Information -->
+            <div class="section-card">
+                <h2 class="section-title">
+                    <i class="fas fa-file-invoice"></i> Billing Information
+                </h2>
+                <div class="billing-grid">
+                    <div class="billing-item">
+                        <span class="billing-label">Order Number</span>
+                        <span class="billing-value" id="billingOrderNumber">Loading...</span>
+                    </div>
+                    <div class="billing-item">
+                        <span class="billing-label">Order Date</span>
+                        <span class="billing-value" id="billingOrderDate">Loading...</span>
+                    </div>
+                    <div class="billing-item">
+                        <span class="billing-label">Payment Method</span>
+                        <span class="billing-value" id="billingPaymentMethod">Loading...</span>
+                    </div>
+                    <div class="billing-item">
+                        <span class="billing-label">Status</span>
+                        <span class="billing-value" style="color: var(--pink);">Paid</span>
+                    </div>
+                    <div class="billing-item">
+                        <span class="billing-label">Total Amount</span>
+                        <span class="billing-value" id="billingTotal">Loading...</span>
+                    </div>
+                    <div class="billing-item">
+                        <span class="billing-label">Invoice ID</span>
+                        <span class="billing-value" id="billingInvoiceId">INV-2025-XXXX</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="section-card">
+                <h2 class="section-title">
+                    <i class="fas fa-list-alt"></i> Order Summary
+                </h2>
+                <table class="order-summary-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th class="amount">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderSummaryBody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--silver);">Loading...</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" style="text-align: right; color: var(--light); font-weight: 700; padding-top: 16px;">Total:</td>
+                            <td class="amount" id="orderSummaryTotal" style="padding-top: 16px; font-size: 18px; font-weight: 800;">$0.00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Token Balance & Payment Confirmation -->
+            <div class="token-balance-card">
+                <h2 class="section-title" style="margin-bottom: 16px;">
+                    <i class="fas fa-coins"></i> Payment Confirmation
+                </h2>
+                <div class="token-display">
+                    <div>
+                        <div style="color: var(--silver); font-size: 14px; margin-bottom: 4px;">Starting Balance</div>
+                        <div class="token-amount" id="startingTokenBalance">$1,500,000</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="color: var(--silver); font-size: 14px; margin-bottom: 4px;">Order Total</div>
+                        <div style="color: var(--pink); font-size: 24px; font-weight: 700;" id="orderTokenTotal">-$0.00</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="color: var(--silver); font-size: 14px; margin-bottom: 4px;">Remaining Balance</div>
+                        <div class="token-amount" id="remainingTokenBalance">$1,500,000</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pay-as-you-go Emphasis -->
+            <div class="payg-section">
+                <h2 class="payg-title">
+                    <i class="fas fa-chart-line"></i> Pay-as-You-Go Services
+                </h2>
+                <div class="payg-highlight">
+                    Your remaining tokens power your agent's real-time usage of GPT and LLM services!
+                </div>
+                <div class="payg-details">
+                    Every interaction your agent makes with <strong>GPT-4, GPT-3.5, Claude, or other LLM providers</strong> consumes tokens from your balance. 
+                    The system automatically tracks and deducts tokens based on:
+                    <ul style="margin-top: 12px; padding-left: 24px; line-height: 2;">
+                        <li><strong>Input tokens:</strong> Text sent to the LLM (prompts, context, instructions)</li>
+                        <li><strong>Output tokens:</strong> Responses generated by the LLM</li>
+                        <li><strong>Model pricing:</strong> Different models have different token costs</li>
+                        <li><strong>Real-time monitoring:</strong> Track usage in your dashboard</li>
+                    </ul>
+                    <div style="margin-top: 16px; padding: 12px; background: rgba(0, 229, 255, 0.1); border-radius: 8px; border-left: 3px solid var(--cyan);">
+                        <strong style="color: var(--cyan);">⚡ Auto-Renewal Available:</strong> Set up automatic token replenishment when your balance runs low to ensure uninterrupted agent operations.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Contract Info -->
+            <div class="smart-contract-card">
+                <h2 class="contract-title">
+                    <i class="fas fa-file-contract"></i> Smart Contract Revenue Distribution
+                </h2>
+                <div class="contract-text">
+                    <strong>Automated Revenue Sharing:</strong> Smart contracts automatically distribute revenue shares once transactions confirm on-chain. 
+                    This ensures transparent, immutable, and trustless revenue distribution between stakeholders. 
+                    No manual intervention required - the blockchain handles everything automatically when transaction confirmations are received.
+                </div>
+            </div>
+
+            <!-- API Key Section -->
+            <div class="section-card">
+                <div class="api-key-section">
+                    <div class="api-key-header">
+                        <div class="api-key-label">
+                            <i class="fas fa-key"></i> API Key
+                            <span class="secret-badge">
+                                <i class="fas fa-lock"></i> SECRET
+                            </span>
+                        </div>
+                    </div>
+                    <div class="api-key-container">
+                        <span class="api-key-value" id="apiKeyValue">age_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+                        <button class="copy-btn" id="copyApiKeyBtn" onclick="copyApiKey()">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="email-notification">
+                        <i class="fas fa-envelope email-icon"></i>
+                        <div class="email-text">
+                            <strong>Email Notification:</strong> Complete API key information and credentials have been sent to your registered email address. 
+                            Please check your inbox (and spam folder) for the detailed deployment instructions.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="sandbox.html" class="action-btn action-btn-primary">
+                    <i class="fas fa-flask"></i> Go to Sandbox
+                </a>
+                <a href="dashboard_company.html" class="action-btn action-btn-secondary">
+                    <i class="fas fa-tachometer-alt"></i> View Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/starfield.js"></script>
+    <script src="../assets/toaster.js"></script>
+    <script src="../assets/app.js"></script>
+    <script src="../assets/supabase-config.js"></script>
+    <script>
+        // Get order confirmation data from session storage
+        const orderData = JSON.parse(sessionStorage.getItem('orderConfirmation'));
+
+        if (!orderData) {
+            // Try to get from order-confirmation page data
+            console.warn('No order data found in session storage');
+        }
+
+        // Format price
+        function formatPrice(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        // Generate API Key (mock)
+        function generateApiKey() {
+            const prefix = 'age_';
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let key = prefix;
+            for (let i = 0; i < 32; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return key;
+        }
+
+        // Copy API Key
+        function copyApiKey() {
+            const apiKeyValue = document.getElementById('apiKeyValue').textContent;
+            navigator.clipboard.writeText(apiKeyValue).then(() => {
+                const btn = document.getElementById('copyApiKeyBtn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.classList.add('copied');
+                
+                if (typeof showNotification === 'function') {
+                    showNotification('API key copied to clipboard!', 'success');
+                }
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                if (typeof showNotification === 'function') {
+                    showNotification('Failed to copy API key', 'error');
+                }
+            });
+        }
+
+        // Render billing data
+        function renderBillingData() {
+            if (!orderData) {
+                // Use default/mock data if no order data
+                document.getElementById('billingOrderNumber').textContent = 'ORD-' + Date.now();
+                document.getElementById('billingOrderDate').textContent = formatDate(new Date());
+                document.getElementById('billingPaymentMethod').textContent = 'Agentryxx Tokens';
+                document.getElementById('billingTotal').textContent = formatPrice(0);
+                return;
+            }
+
+            // Set billing information
+            document.getElementById('billingOrderNumber').textContent = orderData.orderNumber || 'ORD-' + Date.now();
+            const orderDate = orderData.timestamp ? orderData.timestamp : new Date();
+            document.getElementById('billingOrderDate').textContent = formatDate(orderDate);
+            
+            // Set payment method
+            const paymentMethods = {
+                'tokens': 'Agentryxx Tokens',
+                'stablecoin': 'Stable Coin',
+                'eur': 'EUR'
+            };
+            document.getElementById('billingPaymentMethod').textContent = paymentMethods[orderData.paymentMethod] || 'Agentryxx Tokens';
+            document.getElementById('billingTotal').textContent = formatPrice(orderData.totalPrice || 0);
+
+            // Render order summary
+            const orderSummaryBody = document.getElementById('orderSummaryBody');
+            if (orderData.items && orderData.items.length > 0) {
+                const itemsHTML = orderData.items.map(item => {
+                    const price = typeof item.price === 'number' ? item.price : 
+                                  typeof item.priceNumeric === 'number' ? item.priceNumeric : 
+                                  parseFloat(item.price || 0);
+                    const quantity = item.quantity || 1;
+                    const total = price * quantity;
+                    
+                    return `
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>${quantity}</td>
+                            <td>${formatPrice(price)}</td>
+                            <td class="amount">${formatPrice(total)}</td>
+                        </tr>
+                    `;
+                }).join('');
+                orderSummaryBody.innerHTML = itemsHTML;
+            } else {
+                orderSummaryBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--silver);">No items found</td></tr>';
+            }
+
+            // Set order summary total
+            document.getElementById('orderSummaryTotal').textContent = formatPrice(orderData.totalPrice || 0);
+
+            // Set token balances (only if payment method is tokens)
+            if (orderData.paymentMethod === 'tokens') {
+                const startingBalance = 1500000;
+                const orderTotal = orderData.totalPrice || 0;
+                const remainingBalance = startingBalance - orderTotal;
+                
+                document.getElementById('startingTokenBalance').textContent = formatPrice(startingBalance);
+                document.getElementById('orderTokenTotal').textContent = formatPrice(-orderTotal);
+                document.getElementById('remainingTokenBalance').textContent = formatPrice(remainingBalance);
+            } else {
+                // Hide or adjust token balance section for non-token payments
+                document.querySelector('.token-balance-card').style.display = 'none';
+            }
+        }
+
+        // Initialize API Key
+        function initializeApiKey() {
+            // Check if API key already exists in session/local storage
+            let apiKey = sessionStorage.getItem('apiKey');
+            if (!apiKey) {
+                apiKey = generateApiKey();
+                sessionStorage.setItem('apiKey', apiKey);
+            }
+            document.getElementById('apiKeyValue').textContent = apiKey;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderBillingData();
+            initializeApiKey();
+        });
+    </script>
+</body>
+</html>
+

@@ -789,9 +789,6 @@
                     <i class="fas fa-wallet"></i>
                     <span class="cart-badge" id="tokenBalance">0</span>
                 </button>
-                <button class="cart-btn" onclick="openOrderHistory()" title="Order History">
-                    <i class="fas fa-history"></i>
-                </button>
                 <button class="cart-btn" onclick="openCartModal()" title="Shopping Cart">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-badge" id="cartBadge">0</span>
@@ -1937,36 +1934,14 @@
             if (cart.length === 0) return;
             
             try {
-                if (typeof cartAPI === 'undefined' || !cartAPI.userId) {
-                    if (typeof showToast !== 'undefined') {
-                        showToast('Please login to checkout', 'error');
-                    } else {
-                        alert('Please login to checkout');
-                    }
-                    return;
-                }
-                
-                // Create order from cart
-                const result = await cartAPI.createOrder('tokens');
-                
-                // Clear cart
-                await loadCart();
-                closeCartModal();
-                
-                if (typeof showToast !== 'undefined') {
-                    showToast('Order placed successfully!', 'success');
-                } else {
-                    alert('Order placed successfully!');
-                }
-                
-                // Open order history
-                openOrderHistory();
+                // Redirect to checkout page without login requirement
+                window.location.href = 'checkout.html';
             } catch (error) {
                 console.error('Checkout error:', error);
                 if (typeof showToast !== 'undefined') {
-                    showToast('Failed to place order. Please try again.', 'error');
+                    showToast('Failed to open checkout. Please try again.', 'error');
                 } else {
-                    alert('Failed to place order. Please try again.');
+                    alert('Failed to open checkout. Please try again.');
                 }
             }
         }

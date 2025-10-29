@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - Agentryxx</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .confirmation-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            color: var(--cyan);
+            margin-bottom: 24px;
+            animation: scaleIn 0.5s ease-out;
+            background: rgba(0, 229, 255, 0.1);
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            border: 3px solid var(--cyan);
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .confirmation-title {
+            color: var(--cyan);
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .confirmation-message {
+            color: var(--silver);
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .order-details {
+            background: rgba(46, 46, 46, 0.3);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            padding: 32px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 32px;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: var(--silver);
+            font-size: 14px;
+        }
+
+        .detail-value {
+            color: var(--cyan);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .order-items {
+            background: rgba(10, 17, 40, 0.6);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .order-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .item-name {
+            color: var(--light);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .item-total {
+            color: var(--cyan);
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .item-details {
+            display: flex;
+            justify-content: space-between;
+            color: var(--silver);
+            font-size: 13px;
+            padding-left: 12px;
+        }
+
+        .item-unit-price {
+            color: var(--silver);
+        }
+
+        .item-quantity {
+            color: var(--silver);
+        }
+
+        .balance-section {
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .balance-title {
+            color: var(--cyan);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .balance-label {
+            color: var(--silver);
+            font-size: 14px;
+        }
+
+        .balance-amount {
+            color: var(--cyan);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .balance-remaining {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-top: 2px solid rgba(0, 229, 255, 0.3);
+            margin-top: 12px;
+        }
+
+        .balance-remaining-label {
+            color: var(--light);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .balance-remaining-amount {
+            color: var(--pink);
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid rgba(0, 229, 255, 0.3);
+        }
+
+        .total-label {
+            color: var(--light);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .total-amount {
+            color: var(--cyan);
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .payment-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .badge-tokens {
+            background: rgba(0, 229, 255, 0.2);
+            color: var(--cyan);
+            border: 1px solid var(--cyan);
+        }
+
+        .badge-stablecoin {
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+            border: 1px solid #FFD700;
+        }
+
+        .badge-eur {
+            background: rgba(255, 140, 0, 0.2);
+            color: #FF8C00;
+            border: 1px solid #FF8C00;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">Agentry<span class="xx">xx</span></div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <a href="dashboard_company.html" style="padding: 8px 16px; border-radius: 8px; background: rgba(46, 46, 46, 0.3); border: 1px solid rgba(0, 229, 255, 0.3); color: var(--cyan); text-decoration: none; transition: all 0.3s ease;">Dashboard</a>
+                <a href="marketplace.html" style="padding: 8px 16px; border-radius: 8px; background: rgba(46, 46, 46, 0.3); border: 1px solid rgba(0, 229, 255, 0.3); color: var(--cyan); text-decoration: none; transition: all 0.3s ease;">Marketplace</a>
+            </div>
+        </nav>
+
+        <div class="confirmation-container">
+            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+            <h1 class="confirmation-title">Order Confirmed!</h1>
+            <p class="confirmation-message">Thank you for your purchase. Your order has been successfully processed.</p>
+
+            <div class="order-details" id="orderDetails">
+                <div class="detail-row">
+                    <span class="detail-label">Order Number:</span>
+                    <span class="detail-value" id="orderNumber">Loading...</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value" id="orderDate">Loading...</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Payment Method:</span>
+                    <span class="detail-value" id="paymentMethod">
+                        <span class="payment-badge" id="paymentBadge">Loading...</span>
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value" style="color: var(--pink); font-weight: 700;">Paid</span>
+                </div>
+
+                <!-- Order Items -->
+                <div style="margin-top: 24px;">
+                    <h3 style="color: var(--cyan); font-size: 18px; margin-bottom: 16px; text-align: center;">Order Items</h3>
+                    <div class="order-items" id="orderItems"></div>
+                </div>
+
+                <!-- Order Total -->
+                <div class="order-total">
+                    <span class="total-label">Total:</span>
+                    <span class="total-amount" id="orderTotal">$0.00</span>
+                </div>
+
+                <!-- Balance Section -->
+                <div class="balance-section" id="balanceSection" style="display: none;">
+                    <div class="balance-title">
+                        <i class="fas fa-wallet"></i>
+                        Token Balance
+                    </div>
+                    <div class="balance-row">
+                        <span class="balance-label">Starting Balance:</span>
+                        <span class="balance-amount" id="startingBalance">$1,500,000</span>
+                    </div>
+                    <div class="balance-row">
+                        <span class="balance-label">Order Total:</span>
+                        <span class="balance-amount" id="orderTotalBalance">-$0.00</span>
+                    </div>
+                    <div class="balance-remaining">
+                        <span class="balance-remaining-label">Remaining Balance:</span>
+                        <span class="balance-remaining-amount" id="remainingBalance">$1,500,000</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 16px; justify-content: center; margin-top: 40px; flex-wrap: wrap;">
+                <a href="sandbox.html" class="btn btn-primary" style="padding: 14px 32px; font-size: 16px; display: inline-flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-flask"></i> Go to Sandbox
+                </a>
+                <a href="billing-and-deployment.html" class="btn btn-secondary" style="padding: 14px 32px; font-size: 16px; display: inline-flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-receipt"></i> Billing and Deployment
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="../assets/starfield.js"></script>
+    <script src="../assets/toaster.js"></script>
+    <script src="../assets/app.js"></script>
+    <script src="../assets/supabase-config.js"></script>
+    <script>
+        // Get order confirmation data from session storage
+        const orderData = JSON.parse(sessionStorage.getItem('orderConfirmation'));
+
+        if (!orderData) {
+            // No order data found, redirect to marketplace
+            window.location.href = 'marketplace.html';
+        }
+
+        // Format price
+        function formatPrice(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Format payment method
+        function formatPaymentMethod(method) {
+            const methods = {
+                'tokens': { name: 'Agentryxx Tokens', badge: 'badge-tokens', icon: 'fas fa-coins' },
+                'stablecoin': { name: 'Stable Coin', badge: 'badge-stablecoin', icon: 'fas fa-dollar-sign' },
+                'eur': { name: 'EUR', badge: 'badge-eur', icon: 'fas fa-euro-sign' }
+            };
+            
+            return methods[method] || { name: method, badge: 'badge-tokens', icon: 'fas fa-coins' };
+        }
+
+        // Render order confirmation
+        function renderConfirmation() {
+            if (!orderData) return;
+
+            // Set order details
+            document.getElementById('orderNumber').textContent = orderData.orderNumber || 'N/A';
+            // Use stored timestamp if available, otherwise use current date
+            const orderDate = orderData.timestamp ? orderData.timestamp : new Date();
+            document.getElementById('orderDate').textContent = formatDate(orderDate);
+            
+            // Set payment method
+            const paymentInfo = formatPaymentMethod(orderData.paymentMethod);
+            document.getElementById('paymentBadge').textContent = paymentInfo.name;
+            document.getElementById('paymentBadge').className = 'payment-badge ' + paymentInfo.badge;
+            document.getElementById('paymentBadge').innerHTML = `<i class="${paymentInfo.icon}"></i> ${paymentInfo.name}`;
+
+            // Set order total
+            document.getElementById('orderTotal').textContent = formatPrice(orderData.totalPrice);
+
+            // Render order items with detailed pricing
+            const itemsContainer = document.getElementById('orderItems');
+            if (orderData.items && orderData.items.length > 0) {
+                const itemsHTML = orderData.items.map(item => {
+                    const price = typeof item.price === 'number' ? item.price : 
+                                  typeof item.priceNumeric === 'number' ? item.priceNumeric : 
+                                  parseFloat(item.price || 0);
+                    const quantity = item.quantity || 1;
+                    const total = price * quantity;
+                    
+                    return `
+                        <div class="order-item">
+                            <div class="item-header">
+                                <span class="item-name">${item.name}</span>
+                                <span class="item-total">${formatPrice(total)}</span>
+                            </div>
+                            <div class="item-details">
+                                <span class="item-unit-price">${formatPrice(price)} per year</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                itemsContainer.innerHTML = itemsHTML;
+            } else {
+                itemsContainer.innerHTML = '<p style="color: var(--silver);">No items</p>';
+            }
+
+            // Show balance section for token payments
+            const balanceSection = document.getElementById('balanceSection');
+            if (orderData.paymentMethod === 'tokens') {
+                const startingBalance = 1500000;
+                const orderTotal = orderData.totalPrice;
+                const remainingBalance = startingBalance - orderTotal;
+                
+                balanceSection.style.display = 'block';
+                document.getElementById('startingBalance').textContent = formatPrice(startingBalance);
+                document.getElementById('orderTotalBalance').textContent = formatPrice(-orderTotal);
+                document.getElementById('remainingBalance').textContent = formatPrice(remainingBalance);
+            } else {
+                balanceSection.style.display = 'none';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', renderConfirmation);
+    </script>
+</body>
+</html>
+

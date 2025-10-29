@@ -4,8 +4,8 @@ const SUPABASE_URL = 'https://uqwtzggvltodppaaezcj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxd3R6Z2d2bHRvZHBwYWFlemNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NzQ4MjMsImV4cCI6MjA3NjI1MDgyM30.RMHTGwX0FBORVJapQ1gxt0jtIHbTbuiE7fODSia_eFc';
 const SUPABASE_JWT_SECRET = 'SJSZnQS/7U3nR2xLc6zw227I7k7r94jPXXXIlEhAeSuCi2rKZtqkwvvO12imE8h7PkWBy3LolMFjHMWth/Mcmg==';
 
-// Initialize Supabase client
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Initialize Supabase client (using global supabase from CDN)
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Authentication helper functions
 class AuthManager {
@@ -28,7 +28,7 @@ class AuthManager {
         try {
             const passwordHash = await this.hashPassword(password);
             
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('custom_auth')
                 .insert([{
                     email: email,
@@ -54,7 +54,7 @@ class AuthManager {
         try {
             const passwordHash = await this.hashPassword(password);
             
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('custom_auth')
                 .select('*')
                 .eq('email', email)
@@ -111,7 +111,7 @@ class FileUploadManager {
             const fileName = `${userId}_${documentType}_${timestamp}.${fileExtension}`;
 
             // Upload file
-            const { data, error } = await supabase.storage
+            const { data, error } = await supabaseClient.storage
                 .from(this.bucketName)
                 .upload(fileName, file);
 
@@ -120,7 +120,7 @@ class FileUploadManager {
             }
 
             // Get public URL
-            const { data: urlData } = supabase.storage
+            const { data: urlData } = supabaseClient.storage
                 .from(this.bucketName)
                 .getPublicUrl(fileName);
 
@@ -137,7 +137,7 @@ class FileUploadManager {
     // Delete file from storage
     async deleteFile(fileName) {
         try {
-            const { error } = await supabase.storage
+            const { error } = await supabaseClient.storage
                 .from(this.bucketName)
                 .remove([fileName]);
 
@@ -160,7 +160,7 @@ class DatabaseManager {
     // Insert KYC data
     async insertKYCData(kycData) {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('kyc_data')
                 .insert([kycData]);
 
@@ -178,7 +178,7 @@ class DatabaseManager {
     // Insert KYB data
     async insertKYBData(kybData) {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('kyb_data')
                 .insert([kybData]);
 
@@ -265,7 +265,7 @@ class DatabaseManager {
                 status: 'pending' // New agents need approval
             };
 
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('agents')
                 .insert([agent])
                 .select();
@@ -288,7 +288,7 @@ class DatabaseManager {
     // Get user's current token balance
     async getUserTokenBalance(userId) {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('custom_auth')
                 .select('token_balance')
                 .eq('id', userId)
@@ -308,7 +308,7 @@ class DatabaseManager {
     // Deduct tokens for a purchase (creates transaction record)
     async deductTokens(userId, amount, orderId, description = null) {
         try {
-            const { data, error } = await supabase.rpc('adjust_user_tokens', {
+            const { data, error } = await supabaseClient.rpc('adjust_user_tokens', {
                 p_user_id: userId,
                 p_amount: -amount, // Negative for deduction
                 p_transaction_type: 'purchase',
@@ -331,7 +331,7 @@ class DatabaseManager {
     // Get user's transaction history
     async getTransactionHistory(userId, limit = 50) {
         try {
-            const { data, error } = await supabase.rpc('get_user_transactions', {
+            const { data, error } = await supabaseClient.rpc('get_user_transactions', {
                 p_user_id: userId,
                 p_limit: limit
             });
@@ -350,7 +350,7 @@ class DatabaseManager {
     // Add tokens (admin function)
     async addTokens(userId, amount, description = 'Admin addition', metadata = null) {
         try {
-            const { data, error } = await supabase.rpc('adjust_user_tokens', {
+            const { data, error } = await supabaseClient.rpc('adjust_user_tokens', {
                 p_user_id: userId,
                 p_amount: amount, // Positive for addition
                 p_transaction_type: 'admin_add',
@@ -377,7 +377,7 @@ const fileUploadManager = new FileUploadManager();
 const databaseManager = new DatabaseManager();
 
 // Export for use in other scripts
-window.supabase = supabase;
+window.supabase = supabaseClient;
 window.authManager = authManager;
 window.fileUploadManager = fileUploadManager;
 window.databaseManager = databaseManager;
