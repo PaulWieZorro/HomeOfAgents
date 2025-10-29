@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Company Dashboard - Agentryxx</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .charts-container {
             display: grid;
@@ -62,6 +64,353 @@
             color: var(--silver);
             font-size: 14px;
         }
+        
+        /* Dropdown Menu Styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-toggle {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 8px;
+            background: rgba(46, 46, 46, 0.95);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            min-width: 200px;
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .dropdown-menu a {
+            display: block;
+            padding: 12px 16px;
+            color: var(--silver);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+        }
+        
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-menu a:hover {
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--cyan);
+        }
+        
+        .dropdown-arrow {
+            display: inline-block;
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+        }
+        
+        .dropdown.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+        
+        .btn i {
+            margin-right: 6px;
+        }
+        
+        /* Wallet Modal Styles */
+        .wallet-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 17, 40, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .wallet-modal.open {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .wallet-modal-content {
+            background: rgba(46, 46, 46, 0.95);
+            border: 2px solid rgba(0, 229, 255, 0.3);
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        
+        .wallet-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        
+        .wallet-modal-header h2 {
+            color: var(--cyan);
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .wallet-close {
+            background: none;
+            border: none;
+            color: var(--silver);
+            font-size: 32px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        .wallet-close:hover {
+            color: var(--cyan);
+            background: rgba(0, 229, 255, 0.1);
+        }
+        
+        .wallet-body {
+            padding: 24px;
+        }
+        
+        .wallet-balance-display {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(255, 0, 127, 0.15));
+            padding: 32px;
+            border-radius: 12px;
+            border: 2px solid rgba(0, 229, 255, 0.3);
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .wallet-balance-label {
+            font-size: 16px;
+            color: var(--silver);
+            opacity: 0.8;
+            margin-bottom: 12px;
+        }
+        
+        .wallet-balance-amount {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--cyan);
+            margin-bottom: 8px;
+        }
+        
+        .wallet-balance-subtitle {
+            font-size: 14px;
+            color: var(--silver);
+            opacity: 0.7;
+        }
+        
+        .payment-methods-section {
+            margin-bottom: 32px;
+        }
+        
+        .payment-methods-section h3 {
+            color: var(--cyan);
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        
+        .payment-method-card {
+            background: rgba(46, 46, 46, 0.5);
+            border: 2px solid rgba(0, 229, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-method-card:hover {
+            border-color: rgba(0, 229, 255, 0.5);
+            background: rgba(0, 229, 255, 0.05);
+        }
+        
+        .payment-method-card.active {
+            border-color: var(--cyan);
+            background: rgba(0, 229, 255, 0.1);
+        }
+        
+        .payment-method-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .payment-method-icon {
+            font-size: 24px;
+            color: var(--cyan);
+        }
+        
+        .payment-method-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--light);
+        }
+        
+        .payment-method-desc {
+            font-size: 14px;
+            color: var(--silver);
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+        
+        .top-up-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .top-up-actions button {
+            flex: 1;
+        }
+        
+        .wallet-flow-info {
+            background: rgba(255, 0, 127, 0.1);
+            border: 1px solid rgba(255, 0, 127, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .wallet-flow-info p {
+            color: var(--light);
+            font-size: 14px;
+            margin: 0;
+            line-height: 1.6;
+        }
+        
+        .wallet-flow-info strong {
+            color: var(--cyan);
+        }
+        
+        .amount-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin: 24px 0;
+            padding: 20px;
+            background: rgba(0, 229, 255, 0.05);
+            border-radius: 12px;
+            border: 2px solid rgba(0, 229, 255, 0.3);
+        }
+        
+        .amount-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid var(--cyan);
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--cyan);
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .amount-btn:hover {
+            background: rgba(0, 229, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .amount-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .amount-display {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--cyan);
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .quick-amounts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 24px 0;
+        }
+        
+        .quick-amount-btn {
+            padding: 16px;
+            background: rgba(46, 46, 46, 0.5);
+            border: 2px solid rgba(0, 229, 255, 0.2);
+            border-radius: 8px;
+            color: var(--light);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .quick-amount-btn:hover {
+            border-color: var(--cyan);
+            background: rgba(0, 229, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .quick-amount-btn.selected {
+            border-color: var(--cyan);
+            background: rgba(0, 229, 255, 0.2);
+            color: var(--cyan);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+        
+        .confirm-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        
+        .confirm-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -74,11 +423,21 @@
         <nav>
             <div class="logo">Agentry<span class="xx">xx</span></div>
             <div style="display: flex; gap: 12px; align-items: center;">
-                <button id="onboarding-btn" class="onboarding-button">
-                    <span class="bounce-indicator">●</span> Onboarding
-                </button>
+                <div class="dropdown" id="start-dropdown">
+                    <button class="btn btn-primary dropdown-toggle" id="start-btn">
+                        Start <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="dropdown-menu" id="start-menu">
+                        <a href="#" id="onboarding-link">
+                            <span class="bounce-indicator">●</span> Onboarding
+                        </a>
+                        <a href="kyb.html">KYB Verification</a>
+                    </div>
+                </div>
                 <a href="marketplace.html" class="btn btn-primary">Marketplace</a>
-                <a href="kyb.html" class="btn btn-primary">KYB Verification</a>
+                <a href="#" class="btn btn-primary" id="wallet-btn">
+                    <i class="fas fa-wallet"></i> Wallet
+                </a>
                 <a href="login.html" class="btn btn-secondary">Logout</a>
             </div>
         </nav>
@@ -176,7 +535,7 @@
                     <h3>Regulatory Reporting Bot</h3>
                     <p>Generates automated regulatory reports for banks and insurance companies, ensuring compliance with FDIC, SEC, and state insurance regulations.</p>
                     <div style="margin-top: 16px;">
-                        <span style="color: var(--cyan);">Status: Active</span>
+                        <span style="color: #FFD700;">Status: Certification</span>
                         <span style="margin-left: 16px; color: var(--silver);">$980.75 spent</span>
                     </div>
                 </div>
@@ -190,10 +549,429 @@
         </section>
     </div>
 
+    <!-- Wallet Modal -->
+    <div id="walletModal" class="wallet-modal">
+        <div class="wallet-modal-content">
+            <div class="wallet-modal-header">
+                <h2><i class="fas fa-wallet"></i> My Wallet</h2>
+                <button class="wallet-close" onclick="closeWalletModal()">&times;</button>
+            </div>
+            <div class="wallet-body" id="walletModalContent">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
     <script src="../assets/starfield.js"></script>
     <script src="../assets/toaster.js"></script>
     <script src="../assets/app.js"></script>
+    <script src="../assets/supabase-config.js"></script>
     <script src="../assets/dashboard.js"></script>
+    
+    <script>
+        // Dropdown menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdown = document.getElementById('start-dropdown');
+            const dropdownToggle = document.getElementById('start-btn');
+            const dropdownMenu = document.getElementById('start-menu');
+            const onboardingLink = document.getElementById('onboarding-link');
+            
+            // Toggle dropdown on button click
+            dropdownToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('active');
+                dropdownMenu.classList.toggle('show');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target)) {
+                    dropdown.classList.remove('active');
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+            
+            // Handle onboarding link click (preserve existing onboarding functionality)
+            onboardingLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Use the same functionality as the original onboarding button
+                // Redirect to placeholder and show notification (same as dashboard.js)
+                window.location.href = '#onboarding-page';
+                
+                // Show notification if showNotification function exists
+                if (typeof showNotification === 'function') {
+                    showNotification('Onboarding feature coming soon!', 'info');
+                }
+                
+                dropdown.classList.remove('active');
+                dropdownMenu.classList.remove('show');
+            });
+            
+            // Wallet button click handler - open wallet modal
+            const walletBtn = document.getElementById('wallet-btn');
+            if (walletBtn) {
+                walletBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openWalletModal();
+                });
+            }
+        });
+        
+        // Wait for all scripts to be ready
+        function waitForScripts(maxAttempts = 50, attempt = 0) {
+            return new Promise((resolve, reject) => {
+                // Check if Supabase CDN is loaded
+                if (typeof supabase === 'undefined') {
+                    if (attempt >= maxAttempts) {
+                        reject(new Error('Supabase CDN failed to load. Please check your internet connection and refresh the page.'));
+                        return;
+                    }
+                    setTimeout(() => waitForScripts(maxAttempts, attempt + 1).then(resolve).catch(reject), 100);
+                    return;
+                }
+                
+                // Check if authManager and databaseManager are loaded
+                if (typeof window.authManager === 'undefined' || typeof window.databaseManager === 'undefined') {
+                    if (attempt >= maxAttempts) {
+                        reject(new Error('Authentication system not loaded. Please refresh the page.'));
+                        return;
+                    }
+                    setTimeout(() => waitForScripts(maxAttempts, attempt + 1).then(resolve).catch(reject), 100);
+                    return;
+                }
+                
+                resolve();
+            });
+        }
+        
+        // Wallet Modal Functions
+        async function openWalletModal() {
+            try {
+                const modal = document.getElementById('walletModal');
+                const content = document.getElementById('walletModalContent');
+                
+                if (!modal || !content) return;
+                
+                // Show loading
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">⏳</div>
+                        <p style="color: var(--silver);">Loading wallet...</p>
+                    </div>
+                `;
+                
+                modal.classList.add('open');
+                
+                // Wait for scripts to be ready
+                try {
+                    await waitForScripts();
+                } catch (error) {
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+                            <h3 style="color: var(--pink); margin-bottom: 12px;">System Not Ready</h3>
+                            <p style="color: var(--silver); margin-bottom: 12px;">
+                                ${error.message}
+                            </p>
+                            <p style="color: var(--silver); font-size: 14px; margin-bottom: 24px; opacity: 0.8;">
+                                Please wait a moment and try again, or refresh the page.
+                            </p>
+                            <button class="btn btn-primary" onclick="location.reload()" style="margin-right: 12px;">Refresh Page</button>
+                            <button class="btn btn-secondary" onclick="closeWalletModal()">Close</button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Try to get balance if logged in, otherwise use default
+                let currentBalance = 0;
+                let userId = null;
+                
+                try {
+                    const authMgr = window.authManager;
+                    const dbMgr = window.databaseManager;
+                    
+                    if (authMgr && dbMgr) {
+                        const user = authMgr.getCurrentUser();
+                        if (user) {
+                            userId = user.id;
+                            const { data: balance, error } = await dbMgr.getUserTokenBalance(user.id);
+                            if (!error && balance !== null && balance !== undefined) {
+                                currentBalance = balance;
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.log('Could not fetch balance, using default:', err);
+                    // Continue with balance = 0
+                }
+                
+                // Format balance for display
+                function formatBalance(amount) {
+                    return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(amount);
+                }
+                
+                // Initialize top-up amount
+                if (!window.currentTopUpAmount) {
+                    window.currentTopUpAmount = 100000;
+                }
+                
+                // Format balance helper
+                const formatBalanceHelper = (amount) => {
+                    return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(amount);
+                };
+                
+                // Render wallet content
+                content.innerHTML = `
+                    <div class="wallet-balance-display">
+                        <div class="wallet-balance-label">Current Balance</div>
+                        <div class="wallet-balance-amount" id="walletBalanceAmount">${formatBalanceHelper(currentBalance)}</div>
+                        <div class="wallet-balance-subtitle">Marketplace Tokens Available</div>
+                    </div>
+                    
+                    <div class="payment-methods-section">
+                        <h3>Top Up Payment Methods</h3>
+                        
+                        <div class="payment-method-card" onclick="selectPaymentMethod('eur')" id="payment-eur">
+                            <div class="payment-method-header">
+                                <i class="fas fa-euro-sign payment-method-icon"></i>
+                                <span class="payment-method-name">EUR (FIAT)</span>
+                            </div>
+                            <div class="payment-method-desc">
+                                Credit card or bank transfer. Instant conversion to marketplace tokens.
+                            </div>
+                        </div>
+                        
+                        <div class="payment-method-card" onclick="selectPaymentMethod('stablecoin')" id="payment-stablecoin">
+                            <div class="payment-method-header">
+                                <i class="fas fa-dollar-sign payment-method-icon"></i>
+                                <span class="payment-method-name">Stablecoins</span>
+                            </div>
+                            <div class="payment-method-desc">
+                                Pay with USDC, USDT, or DAI. Crypto payments converted to marketplace tokens.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 32px;">
+                        <h3 style="color: var(--cyan); margin-bottom: 16px; font-size: 18px; text-align: center;">Select Amount</h3>
+                        
+                        <div class="quick-amounts">
+                            <div class="quick-amount-btn" onclick="setTopUpAmount(50000)" data-amount="50000">
+                                50,000
+                            </div>
+                            <div class="quick-amount-btn selected" onclick="setTopUpAmount(100000)" data-amount="100000">
+                                100,000
+                            </div>
+                            <div class="quick-amount-btn" onclick="setTopUpAmount(250000)" data-amount="250000">
+                                250,000
+                            </div>
+                            <div class="quick-amount-btn" onclick="setTopUpAmount(500000)" data-amount="500000">
+                                500,000
+                            </div>
+                            <div class="quick-amount-btn" onclick="setTopUpAmount(1000000)" data-amount="1000000">
+                                1,000,000
+                            </div>
+                            <div class="quick-amount-btn" onclick="setTopUpAmount(5000000)" data-amount="5000000">
+                                5,000,000
+                            </div>
+                        </div>
+                        
+                        <div class="amount-selector">
+                            <button class="amount-btn" onclick="adjustTopUpAmount(-10000)">−</button>
+                            <div class="amount-display" id="topUpAmountDisplay">${formatBalanceHelper(window.currentTopUpAmount)}</div>
+                            <button class="amount-btn" onclick="adjustTopUpAmount(10000)">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="confirm-section">
+                        <button class="btn btn-primary confirm-btn" onclick="confirmTopUp()">
+                            <i class="fas fa-check-circle"></i> Confirm Top Up
+                        </button>
+                    </div>
+                `;
+                
+                // Set default payment method
+                selectedPaymentMethod = 'eur';
+                document.getElementById('payment-eur').classList.add('active');
+                
+            } catch (error) {
+                console.error('Error opening wallet modal:', error);
+                const content = document.getElementById('walletModalContent');
+                if (content) {
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+                            <h3 style="color: var(--pink); margin-bottom: 12px;">Error</h3>
+                            <p style="color: var(--silver); margin-bottom: 8px;">
+                                ${error.message || 'Failed to load wallet'}
+                            </p>
+                            <button class="btn btn-secondary" onclick="closeWalletModal()">Close</button>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Track selected payment method
+        let selectedPaymentMethod = 'eur';
+        
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            
+            // Update active state
+            document.querySelectorAll('.payment-method-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            const selectedCard = document.getElementById(`payment-${method}`);
+            if (selectedCard) {
+                selectedCard.classList.add('active');
+            }
+        }
+        
+        function closeWalletModal() {
+            const modal = document.getElementById('walletModal');
+            if (modal) {
+                modal.classList.remove('open');
+            }
+        }
+        
+        // Top-up amount management
+        function setTopUpAmount(amount) {
+            window.currentTopUpAmount = amount;
+            updateTopUpDisplay();
+            
+            // Update selected state on quick amount buttons
+            document.querySelectorAll('.quick-amount-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                // Check if this button corresponds to the selected amount
+                const btnText = btn.textContent.trim().replace(/,/g, '');
+                if (parseInt(btnText) === amount) {
+                    btn.classList.add('selected');
+                }
+            });
+        }
+        
+        function adjustTopUpAmount(change) {
+            window.currentTopUpAmount = Math.max(10000, window.currentTopUpAmount + change);
+            updateTopUpDisplay();
+            
+            // Clear selected state from quick buttons when manually adjusting
+            document.querySelectorAll('.quick-amount-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        }
+        
+        function updateTopUpDisplay() {
+            const display = document.getElementById('topUpAmountDisplay');
+            if (display) {
+                display.textContent = formatTopUpAmount(window.currentTopUpAmount);
+            }
+        }
+        
+        function formatTopUpAmount(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+        
+        // Confirm top-up and add tokens
+        async function confirmTopUp() {
+            try {
+                const amount = window.currentTopUpAmount || 100000;
+                
+                // Check if managers are available
+                if (typeof window.authManager === 'undefined' || typeof window.databaseManager === 'undefined') {
+                    if (typeof showNotification === 'function') {
+                        showNotification('System not ready. Please refresh the page.', 'error');
+                    } else {
+                        alert('System not ready. Please refresh the page.');
+                    }
+                    return;
+                }
+                
+                const user = window.authManager.getCurrentUser();
+                if (!user) {
+                    // If not logged in, just show success message and update display
+                    // In a real scenario, you'd need login for actual payment processing
+                    if (typeof showNotification === 'function') {
+                        showNotification(`${formatTopUpAmount(amount)} added to wallet!`, 'success');
+                    }
+                    
+                    // Update balance display (mock update for demo)
+                    const balanceEl = document.getElementById('walletBalanceAmount');
+                    const currentBalance = parseFloat(balanceEl.textContent.replace(/[^0-9.-]+/g, '')) || 0;
+                    const newBalance = currentBalance + amount;
+                    balanceEl.textContent = formatTopUpAmount(newBalance);
+                    return;
+                }
+                
+                // User is logged in - add tokens to database
+                const { data: transactionId, error } = await window.databaseManager.addTokens(
+                    user.id,
+                    amount,
+                    `Top up via ${selectedPaymentMethod.toUpperCase()}`,
+                    { paymentMethod: selectedPaymentMethod }
+                );
+                
+                if (error) {
+                    throw error;
+                }
+                
+                // Refresh balance display
+                const { data: newBalance } = await window.databaseManager.getUserTokenBalance(user.id);
+                const balanceEl = document.getElementById('walletBalanceAmount');
+                if (balanceEl) {
+                    balanceEl.textContent = formatTopUpAmount(newBalance || 0);
+                }
+                
+                // Show success
+                if (typeof showNotification === 'function') {
+                    showNotification(`${formatTopUpAmount(amount)} added to wallet!`, 'success');
+                } else {
+                    alert(`${formatTopUpAmount(amount)} added to wallet!`);
+                }
+                
+            } catch (error) {
+                console.error('Error confirming top-up:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Failed to add tokens. Please try again.', 'error');
+                } else {
+                    alert('Failed to add tokens. Please try again.');
+                }
+            }
+        }
+        
+        // Close modal when clicking outside
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('walletModal');
+            if (modal && e.target === modal) {
+                closeWalletModal();
+            }
+        });
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeWalletModal();
+            }
+        });
+        
+    </script>
     
     <script>
         // Chart.js configuration
