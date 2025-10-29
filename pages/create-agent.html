@@ -170,8 +170,9 @@
         }
         
         .requirements-summary {
-            margin-top: 40px;
-            padding: 30px;
+            max-width: 800px;
+            margin: 40px auto 0;
+            padding: 20px;
             background: rgba(46, 46, 46, 0.2);
             border: 1px solid rgba(0, 229, 255, 0.3);
             border-radius: 12px;
@@ -180,34 +181,38 @@
         
         .requirements-summary h3 {
             color: var(--cyan);
-            margin-bottom: 20px;
-            font-size: 24px;
+            margin-bottom: 16px;
+            font-size: 20px;
         }
         
         .requirement-section {
-            margin-bottom: 24px;
-            padding: 16px;
+            margin-bottom: 12px;
+            padding: 12px;
             background: rgba(0, 229, 255, 0.05);
-            border-radius: 8px;
-            border-left: 4px solid var(--cyan);
+            border-radius: 6px;
+            border-left: 3px solid var(--cyan);
         }
         
         .requirement-section h4 {
             color: var(--light);
-            margin-bottom: 8px;
-            font-size: 18px;
+            margin-bottom: 4px;
+            font-size: 14px;
+            font-weight: 600;
         }
         
         .requirement-section p {
             color: var(--silver);
-            line-height: 1.6;
+            line-height: 1.4;
+            font-size: 13px;
+            margin: 0;
         }
         
         .action-buttons {
             display: flex;
-            gap: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
             justify-content: center;
-            margin-top: 30px;
+            margin-top: 20px;
         }
         
         .typing-indicator {
@@ -253,13 +258,13 @@
             <div class="chat-container">
                 <div class="chat-messages" id="chatMessages">
                     <div class="message assistant">
-                        <strong>AI Agent Designer:</strong> Hi! I'm here to help you design your AI agent. Let's start by understanding what problem you want to solve. What specific challenge or task would you like your agent to address?
+                        <strong>AI Agent Designer:</strong> Hi! I'm here to help you design your AI agent. Let's start with three key questions. First: What problem are we solving? What specific challenge or task would you like your agent to address?
                     </div>
                 </div>
                 
                 <div class="chat-input-container">
                     <div class="chat-input-wrapper">
-                        <input type="text" class="chat-input" id="chatInput" placeholder="Describe the problem you want to solve..." />
+                        <input type="text" class="chat-input" id="chatInput" placeholder="What problem are we solving?" />
                         <div class="sound-waves" id="soundWaves">
                             <div class="wave"></div>
                             <div class="wave"></div>
@@ -300,34 +305,25 @@
                 <h3>Agent Requirements Summary</h3>
                 
                 <div class="requirement-section">
-                    <h4>Problem Statement</h4>
+                    <h4>Problem Statement (Functional Requirements)</h4>
                     <p id="problemStatement">[Problem will be defined through conversation]</p>
                 </div>
                 
                 <div class="requirement-section">
-                    <h4>Proposed Solution</h4>
-                    <p id="proposedSolution">[Solution will be refined through conversation]</p>
+                    <h4>Quality Requirements (Non-Functional)</h4>
+                    <p id="qualityRequirements">[Speed, security, and reliability requirements will be defined through conversation]</p>
                 </div>
                 
                 <div class="requirement-section">
-                    <h4>Measurable Value</h4>
-                    <p id="measurableValue">[Value metrics will be established through conversation]</p>
-                </div>
-                
-                <div class="requirement-section">
-                    <h4>Technical Requirements</h4>
-                    <p id="technicalRequirements">[Technical specifications will be detailed through conversation]</p>
-                </div>
-                
-                <div class="requirement-section">
-                    <h4>Success Metrics</h4>
-                    <p id="successMetrics">[KPIs and success criteria will be defined through conversation]</p>
+                    <h4>Project Constraints</h4>
+                    <p id="constraints">[Budget and deadline will be defined through conversation]</p>
                 </div>
                 
                 <div class="action-buttons">
-                    <button class="btn btn-secondary" id="editRequirements">Edit Requirements</button>
-                    <button class="btn btn-primary" id="generateAgent">Generate Agent Code</button>
+                    <button class="btn btn-secondary" id="editRequirements">Edit Requirements manually</button>
                     <button class="btn btn-secondary" id="saveDraft">Save as Draft</button>
+                    <button class="btn btn-secondary" id="exportDocument">Export Document</button>
+                    <button class="btn btn-primary" id="findDeveloper">Find a Developer</button>
                 </div>
             </div>
         </section>
@@ -351,10 +347,8 @@
                 this.conversationState = {
                     step: 'problem',
                     problem: '',
-                    solution: '',
-                    value: '',
-                    technical: '',
-                    metrics: ''
+                    quality: '',
+                    constraints: ''
                 };
                 
                 this.isRecording = false;
@@ -402,8 +396,9 @@
                 }
                 
                 document.getElementById('editRequirements').addEventListener('click', () => this.editRequirements());
-                document.getElementById('generateAgent').addEventListener('click', () => this.generateAgent());
                 document.getElementById('saveDraft').addEventListener('click', () => this.saveDraft());
+                document.getElementById('exportDocument').addEventListener('click', () => this.exportDocument());
+                document.getElementById('findDeveloper').addEventListener('click', () => this.findDeveloper());
             }
             
             sendMessage() {
@@ -441,31 +436,21 @@
                 switch (this.conversationState.step) {
                     case 'problem':
                         this.conversationState.problem = message;
-                        response = `Great! I understand you want to solve: "${message}". Now let's think about the solution. How would you envision an AI agent solving this problem? What specific capabilities should it have?`;
-                        this.conversationState.step = 'solution';
+                        response = `Great! I understand you want to solve: "${message}". Now, let's discuss quality requirements. How fast, secure, and reliable must your agent be? Are there any specific performance standards or security requirements?`;
+                        this.chatInput.placeholder = 'How fast/secure/reliable must it be?';
+                        this.conversationState.step = 'quality';
                         break;
                         
-                    case 'solution':
-                        this.conversationState.solution = message;
-                        response = `Excellent solution approach! Now let's define the measurable value. What specific metrics or outcomes would indicate success? For example: time saved, cost reduction, accuracy improvement, etc.`;
-                        this.conversationState.step = 'value';
+                    case 'quality':
+                        this.conversationState.quality = message;
+                        response = `Excellent! Now for the final question: What is your budget and deadline? What are the project constraints we need to work within?`;
+                        this.chatInput.placeholder = 'What is the budget and deadline?';
+                        this.conversationState.step = 'constraints';
                         break;
                         
-                    case 'value':
-                        this.conversationState.value = message;
-                        response = `Perfect! Now let's discuss technical requirements. What integrations, APIs, or data sources would your agent need? Any specific performance requirements?`;
-                        this.conversationState.step = 'technical';
-                        break;
-                        
-                    case 'technical':
-                        this.conversationState.technical = message;
-                        response = `Great technical details! Finally, let's define success metrics. What KPIs would you track to measure the agent's performance? How would you know it's working effectively?`;
-                        this.conversationState.step = 'metrics';
-                        break;
-                        
-                    case 'metrics':
-                        this.conversationState.metrics = message;
-                        response = `Fantastic! I have all the information needed. Let me generate a comprehensive requirements summary for your AI agent.`;
+                    case 'constraints':
+                        this.conversationState.constraints = message;
+                        response = `Perfect! I have all the information needed. Let me generate a comprehensive requirements summary for your AI agent.`;
                         setTimeout(() => this.generateRequirementsSummary(), 1500);
                         break;
                 }
@@ -474,16 +459,14 @@
             }
             
             generateRequirementsSummary() {
-                document.getElementById('problemStatement').textContent = this.conversationState.problem;
-                document.getElementById('proposedSolution').textContent = this.conversationState.solution;
-                document.getElementById('measurableValue').textContent = this.conversationState.value;
-                document.getElementById('technicalRequirements').textContent = this.conversationState.technical;
-                document.getElementById('successMetrics').textContent = this.conversationState.metrics;
+                document.getElementById('problemStatement').textContent = this.conversationState.problem || '[Not specified]';
+                document.getElementById('qualityRequirements').textContent = this.conversationState.quality || '[Not specified]';
+                document.getElementById('constraints').textContent = this.conversationState.constraints || '[Not specified]';
                 
                 this.requirementsSection.style.display = 'block';
                 this.requirementsSection.scrollIntoView({ behavior: 'smooth' });
                 
-                this.addMessage('Requirements summary generated! You can now edit, generate the agent code, or save as a draft.', 'assistant');
+                this.addMessage('Requirements summary generated! You can now edit requirements manually, save as draft, export the document, or find a developer.', 'assistant');
             }
             
             async toggleVoiceInput() {
@@ -604,28 +587,94 @@
             }
             
             editRequirements() {
-                this.requirementsSection.style.display = 'none';
-                this.conversationState.step = 'problem';
-                this.addMessage('Let\'s refine your requirements. What would you like to change or add?', 'assistant');
-            }
-            
-            generateAgent() {
-                this.addMessage('Generating agent code based on your requirements...', 'assistant');
-                // Here you would integrate with actual agent generation service
-                setTimeout(() => {
-                    alert('Agent code generated! Redirecting to deployment...');
-                    window.location.href = 'dashboard_dev.html';
-                }, 2000);
+                // Allow manual editing of the requirements
+                const problemEl = document.getElementById('problemStatement');
+                const qualityEl = document.getElementById('qualityRequirements');
+                const constraintsEl = document.getElementById('constraints');
+                
+                if (problemEl.contentEditable !== 'true') {
+                    problemEl.contentEditable = 'true';
+                    qualityEl.contentEditable = 'true';
+                    constraintsEl.contentEditable = 'true';
+                    
+                    problemEl.style.border = '2px solid var(--cyan)';
+                    qualityEl.style.border = '2px solid var(--cyan)';
+                    constraintsEl.style.border = '2px solid var(--cyan)';
+                    
+                    this.addMessage('Requirements are now editable. Click on any section to edit manually.', 'assistant');
+                } else {
+                    problemEl.contentEditable = 'false';
+                    qualityEl.contentEditable = 'false';
+                    constraintsEl.contentEditable = 'false';
+                    
+                    problemEl.style.border = '';
+                    qualityEl.style.border = '';
+                    constraintsEl.style.border = '';
+                    
+                    // Update conversation state with edited values
+                    this.conversationState.problem = problemEl.textContent;
+                    this.conversationState.quality = qualityEl.textContent;
+                    this.conversationState.constraints = constraintsEl.textContent;
+                    
+                    this.addMessage('Edits saved!', 'assistant');
+                }
             }
             
             saveDraft() {
                 const draft = {
                     timestamp: new Date().toISOString(),
-                    requirements: this.conversationState
+                    requirements: {
+                        problem: document.getElementById('problemStatement').textContent,
+                        quality: document.getElementById('qualityRequirements').textContent,
+                        constraints: document.getElementById('constraints').textContent
+                    }
                 };
                 
                 localStorage.setItem('agentDraft', JSON.stringify(draft));
-                alert('Draft saved successfully!');
+                this.addMessage('Draft saved successfully!', 'assistant');
+            }
+            
+            exportDocument() {
+                const requirements = {
+                    problem: document.getElementById('problemStatement').textContent,
+                    quality: document.getElementById('qualityRequirements').textContent,
+                    constraints: document.getElementById('constraints').textContent
+                };
+                
+                const content = `
+Agent Requirements Document
+Generated: ${new Date().toLocaleString()}
+
+1. Problem Statement (Functional Requirements)
+${requirements.problem}
+
+2. Quality Requirements (Non-Functional)
+${requirements.quality}
+
+3. Project Constraints
+${requirements.constraints}
+                `.trim();
+                
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `agent-requirements-${Date.now()}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.addMessage('Document exported successfully!', 'assistant');
+            }
+            
+            findDeveloper() {
+                this.addMessage('Finding developers for your project...', 'assistant');
+                // Here you would integrate with developer matching service
+                setTimeout(() => {
+                    alert('Developer matching service would be integrated here. Redirecting to marketplace...');
+                    window.location.href = 'marketplace.html';
+                }, 1500);
             }
         }
         
