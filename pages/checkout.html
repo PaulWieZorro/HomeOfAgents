@@ -46,37 +46,51 @@
             background: rgba(46, 46, 46, 0.3);
             border: 1px solid rgba(0, 229, 255, 0.3);
             border-radius: 12px;
-            padding: 24px;
+            padding: 16px;
             backdrop-filter: blur(10px);
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
         .section-title {
             color: var(--cyan);
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 700;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
             border-bottom: 1px solid rgba(0, 229, 255, 0.2);
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
+        }
+
+        .billing-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .billing-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .form-label {
             display: block;
             color: var(--light);
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .form-input {
             width: 100%;
-            padding: 12px 16px;
+            padding: 8px 12px;
             border: 1px solid rgba(0, 229, 255, 0.3);
-            border-radius: 8px;
+            border-radius: 6px;
             background: rgba(10, 17, 40, 0.8);
             color: var(--light);
             font-size: 14px;
@@ -364,52 +378,58 @@
                         <!-- Billing Information -->
                         <div class="checkout-section">
                             <h2 class="section-title">Billing Information</h2>
-                            <div class="form-group">
-                                <label class="form-label" for="billingName">Full Name *</label>
-                                <input type="text" id="billingName" class="form-input" required>
+                            <div class="billing-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="billingName">Full Name *</label>
+                                    <input type="text" id="billingName" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="billingCompany">Company Name *</label>
+                                    <input type="text" id="billingCompany" class="form-input" required>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label" for="billingCompany">Company Name *</label>
-                                <input type="text" id="billingCompany" class="form-input" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="billingEmail">Email *</label>
-                                <input type="email" id="billingEmail" class="form-input" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="billingPhone">Phone</label>
-                                <input type="tel" id="billingPhone" class="form-input">
+                            <div class="billing-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="billingEmail">Email *</label>
+                                    <input type="email" id="billingEmail" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="billingPhone">Phone</label>
+                                    <input type="tel" id="billingPhone" class="form-input">
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label class="form-label" for="billingAddress">Address *</label>
                                 <input type="text" id="billingAddress" class="form-input" required>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label" for="billingCity">City *</label>
-                                <input type="text" id="billingCity" class="form-input" required>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="billing-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="billingCity">City *</label>
+                                    <input type="text" id="billingCity" class="form-input" required>
+                                </div>
                                 <div class="form-group">
                                     <label class="form-label" for="billingState">State/Region *</label>
                                     <input type="text" id="billingState" class="form-input" required>
                                 </div>
+                            </div>
+                            <div class="billing-grid">
                                 <div class="form-group">
                                     <label class="form-label" for="billingZip">ZIP/Postal Code *</label>
                                     <input type="text" id="billingZip" class="form-input" required>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="billingCountry">Country *</label>
-                                <select id="billingCountry" class="form-input" required>
-                                    <option value="">Select Country</option>
-                                    <option value="US">United States</option>
-                                    <option value="DE">Germany</option>
-                                    <option value="FR">France</option>
-                                    <option value="GB">United Kingdom</option>
-                                    <option value="CA">Canada</option>
-                                    <option value="AU">Australia</option>
-                                    <option value="Other">Other</option>
-                                </select>
+                                <div class="form-group">
+                                    <label class="form-label" for="billingCountry">Country *</label>
+                                    <select id="billingCountry" class="form-input" required>
+                                        <option value="">Select Country</option>
+                                        <option value="US">United States</option>
+                                        <option value="DE">Germany</option>
+                                        <option value="FR">France</option>
+                                        <option value="GB">United Kingdom</option>
+                                        <option value="CA">Canada</option>
+                                        <option value="AU">Australia</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
