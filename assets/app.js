@@ -22,6 +22,27 @@ document.addEventListener('DOMContentLoaded', function() {
     observer.observe(contactSection);
   }
   
+  // Fade-in animation for "How It Works" section elements
+  const fadeInElements = document.querySelectorAll('.fade-in-element');
+  if (fadeInElements.length > 0) {
+    const fadeInObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 100);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+    
+    fadeInElements.forEach(element => {
+      fadeInObserver.observe(element);
+    });
+  }
+  
   // Handle contact form
   const contactForm = document.querySelector('#contact-form');
   if (contactForm) {
