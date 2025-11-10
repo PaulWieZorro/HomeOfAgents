@@ -22,12 +22,13 @@ document.addEventListener('DOMContentLoaded', function() {
     observer.observe(contactSection);
   }
   
-  // Fade-in animation for "How It Works" section elements
-  const fadeInElements = document.querySelectorAll('.fade-in-element');
-  if (fadeInElements.length > 0) {
-    const fadeInObserver = new IntersectionObserver((entries) => {
+  // Fade-in animation on scroll for journey steps
+  const journeySteps = document.querySelectorAll('.journey-step');
+  if (journeySteps.length > 0) {
+    const stepObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry, index) => {
         if (entry.isIntersecting) {
+          // Add a slight delay for staggered animation
           setTimeout(() => {
             entry.target.classList.add('visible');
           }, index * 100);
@@ -38,8 +39,8 @@ document.addEventListener('DOMContentLoaded', function() {
       rootMargin: '0px 0px -50px 0px'
     });
     
-    fadeInElements.forEach(element => {
-      fadeInObserver.observe(element);
+    journeySteps.forEach(step => {
+      stepObserver.observe(step);
     });
   }
   
