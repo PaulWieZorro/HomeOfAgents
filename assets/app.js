@@ -22,6 +22,28 @@ document.addEventListener('DOMContentLoaded', function() {
     observer.observe(contactSection);
   }
   
+  // Fade-in animation on scroll for journey steps
+  const journeySteps = document.querySelectorAll('.journey-step');
+  if (journeySteps.length > 0) {
+    const stepObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          // Add a slight delay for staggered animation
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 100);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+    
+    journeySteps.forEach(step => {
+      stepObserver.observe(step);
+    });
+  }
+  
   // Handle contact form
   const contactForm = document.querySelector('#contact-form');
   if (contactForm) {
