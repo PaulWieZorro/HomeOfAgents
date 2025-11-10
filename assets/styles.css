@@ -255,6 +255,240 @@ nav {
   flex-wrap: wrap;
 }
 
+/* How It Works Section */
+.how-it-works-section {
+  padding: 100px 0;
+  text-align: center;
+  position: relative;
+}
+
+.how-it-works-section h2 {
+  font-size: 48px;
+  margin-bottom: 24px;
+  background: linear-gradient(90deg, var(--light), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-subtitle {
+  font-size: 18px;
+  color: var(--silver);
+  max-width: 800px;
+  margin: 0 auto 80px;
+  line-height: 1.6;
+}
+
+.entities-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  margin-bottom: 80px;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.entity {
+  text-align: center;
+  max-width: 280px;
+  position: relative;
+}
+
+.arrow-right,
+.arrow-left {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 32px;
+  color: var(--cyan);
+  animation: pulse-arrow 2s ease-in-out infinite;
+  z-index: 10;
+}
+
+.arrow-right {
+  right: -50px;
+}
+
+.arrow-left {
+  left: -50px;
+}
+
+@keyframes pulse-arrow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.2);
+  }
+}
+
+.entity-icon {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 24px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255, 0, 127, 0.1), rgba(0, 229, 255, 0.1));
+  border: 2px solid rgba(0, 229, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  transition: all 0.4s ease;
+}
+
+.entity-icon i {
+  font-size: 48px;
+  background: linear-gradient(135deg, var(--pink), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.entity:hover .entity-icon {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 40px rgba(0, 229, 255, 0.4);
+  border-color: var(--cyan);
+}
+
+.entity h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--light);
+  line-height: 1.4;
+}
+
+.process-stages {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.process-stage {
+  text-align: center;
+  flex: 0 0 auto;
+}
+
+.stage-icon {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--pink), var(--cyan));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 24px rgba(255, 0, 127, 0.3);
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.stage-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--pink), var(--cyan));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.process-stage:hover .stage-icon::before {
+  opacity: 1;
+}
+
+.stage-icon i {
+  font-size: 32px;
+  color: var(--dark);
+}
+
+.process-stage:hover .stage-icon {
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 8px 40px rgba(255, 0, 127, 0.5), 0 0 60px rgba(0, 229, 255, 0.4);
+}
+
+.process-stage p {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--light);
+  font-family: 'DM Sans', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.fade-in-element {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in-element.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .how-it-works-section h2 {
+    font-size: 36px;
+  }
+  
+  .section-subtitle {
+    font-size: 16px;
+    margin-bottom: 60px;
+  }
+  
+  .entities-container {
+    gap: 40px;
+    margin-bottom: 60px;
+    flex-direction: column;
+  }
+  
+  .entity-icon {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .entity-icon i {
+    font-size: 40px;
+  }
+  
+  .entity h3 {
+    font-size: 18px;
+  }
+  
+  .arrow-right,
+  .arrow-left {
+    display: none;
+  }
+  
+  .process-stages {
+    gap: 24px;
+  }
+  
+  .stage-icon {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .stage-icon i {
+    font-size: 28px;
+  }
+  
+  .process-stage p {
+    font-size: 12px;
+  }
+}
+
 /* Contact Section */
 .contact-section {
   padding: 20px 0 100px;
